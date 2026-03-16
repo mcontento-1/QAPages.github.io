@@ -1,0 +1,2371 @@
+<!DOCTYPE html>
+<!-- saved from url=(0040)http://127.0.0.1:5500/portal-triage.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Support Triage — CreditRiskMonitor</title>
+<style>
+/* ── Reset ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── CRM-Inspired Token System ───────────────────────────── */
+:root {
+  /* Surfaces */
+  --bg:        #eef1f5;
+  --surface:   #ffffff;
+  --card:      #ffffff;
+  --elevated:  #f5f7fa;
+  --hover:     #fff0f0;
+  /* Borders */
+  --b0:        #e2e2e2;
+  --b1:        #cccccc;
+  --b2:        #aaaaaa;
+  /* Text */
+  --t0:        #1a1a1a;
+  --t1:        #444444;
+  --t2:        #777777;
+  --t3:        #aaaaaa;
+  /* CRM Red — primary brand */
+  --red:       #c00000;
+  --red-hover: #a00000;
+  --red-dim:   rgba(192,0,0,.08);
+  --red-light: #fff0f0;
+  /* Amber / Medium priority */
+  --amber:     #c77000;
+  --amber-dim: rgba(199,112,0,.09);
+  /* Green / Low priority */
+  --green:     #1a7a1a;
+  --green-dim: rgba(26,122,26,.09);
+  /* Blue / links */
+  --blue:      #1a4f9c;
+  --blue-dim:  rgba(26,79,156,.09);
+  /* Purple */
+  --purple:    #6b21a8;
+  --purple-dim:rgba(107,33,168,.09);
+  /* Typography */
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --mono: 'Courier New', monospace;
+  --r:    6px;
+  /* Dark chrome — matches creditriskmonitor.com header/nav */
+  --chrome:        #0c1929;
+  --chrome-2:      #102238;
+  --chrome-text:   #dce8f2;
+  --chrome-muted:  rgba(220,232,242,.5);
+  --chrome-border: rgba(255,255,255,.1);
+  --chrome-hover:  rgba(255,255,255,.07);
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--t0);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--b1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--b2); }
+
+/* ── App Shell ───────────────────────────────────────────── */
+#app { display: flex; flex-direction: column; height: 100vh; }
+
+/* ── Red Top Stripe (CRM signature) ─────────────────────── */
+.top-stripe {
+  height: 6px;
+  background: var(--red);
+  flex-shrink: 0;
+}
+
+/* ── Header ──────────────────────────────────────────────── */
+.hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 50px;
+  background: var(--chrome);
+  border-bottom: 2px solid var(--red);
+  flex-shrink: 0;
+}
+.hdr-left { display: flex; align-items: center; gap: 14px; }
+.crm-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.crm-logo .word1 { color: var(--chrome-text); }
+.crm-logo .word2 { color: var(--red); }
+.crm-logo .word3 { color: var(--chrome-text); }
+.hdr-divider { width: 1px; height: 26px; background: var(--chrome-border); }
+.hdr-section {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--chrome-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.hdr-right { display: flex; align-items: center; gap: 14px; }
+.toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--chrome-muted);
+  cursor: pointer;
+  user-select: none;
+}
+.toggle-wrap input[type=checkbox] {
+  appearance: none;
+  width: 28px; height: 16px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.2);
+  border: 1px solid rgba(255,255,255,.2);
+  position: relative;
+  cursor: pointer;
+  transition: background .2s;
+}
+.toggle-wrap input[type=checkbox]::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left .2s;
+}
+.toggle-wrap input[type=checkbox]:checked { background: var(--red); border-color: var(--red); }
+.toggle-wrap input[type=checkbox]:checked::after { left: 14px; }
+.role-sel {
+  padding: 4px 8px;
+  border-radius: var(--r);
+  border: 1px solid var(--chrome-border);
+  background: var(--chrome-hover);
+  color: var(--chrome-text);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+.role-sel:focus { border-color: var(--red); }
+
+/* ── Toolbar ─────────────────────────────────────────────── */
+.tbar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 20px;
+  background: var(--chrome-2);
+  border-bottom: 1px solid var(--chrome-border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  box-shadow: 0 1px 6px rgba(0,0,0,.25);
+}
+.nav-grp {
+  display: flex;
+  gap: 1px;
+  border: 1px solid var(--chrome-border);
+  border-radius: var(--r);
+  overflow: hidden;
+  background: rgba(0,0,0,.25);
+}
+.nav-btn {
+  padding: 5px 13px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(220,232,242,.65);
+  background: transparent;
+  transition: all .12s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.nav-btn:hover { background: var(--chrome-hover); color: var(--chrome-text); }
+.nav-btn.active { background: var(--red); color: #fff; }
+.tbar-div { width: 1px; height: 22px; background: var(--chrome-border); }
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border-radius: var(--r);
+  border: 1px solid var(--chrome-border);
+  background: rgba(255,255,255,.07);
+  transition: border-color .15s;
+}
+.search-box:focus-within { border-color: var(--red); outline: none; }
+.search-box svg { flex-shrink: 0; color: var(--chrome-muted); }
+.search-inp {
+  border: none;
+  background: transparent;
+  color: var(--chrome-text);
+  font-family: var(--font);
+  font-size: 12px;
+  width: 180px;
+  outline: none;
+}
+.search-inp::placeholder { color: var(--chrome-muted); }
+.flt-sel {
+  padding: 4px 8px;
+  border-radius: var(--r);
+  border: 1px solid var(--chrome-border);
+  background: rgba(255,255,255,.07);
+  color: var(--chrome-text);
+  font-family: var(--font);
+  font-size: 11px;
+  cursor: pointer;
+  outline: none;
+}
+.flt-sel:focus { border-color: var(--red); }
+.pf-btn {
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--chrome-border);
+  background: rgba(255,255,255,.06);
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .12s;
+  color: rgba(220,232,242,.6);
+}
+/* triage filter pill active states defined near pill classes */
+.tbar-info { margin-left: auto; font-size: 11px; color: var(--chrome-muted); white-space: nowrap; }
+/* Webhook ghost button override for dark toolbar */
+.tbar .btn-ghost { background: rgba(255,255,255,.07); color: var(--chrome-text); border-color: var(--chrome-border); }
+.tbar .btn-ghost:hover { background: rgba(255,255,255,.13); }
+kbd {
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(0,0,0,.3);
+  border: 1px solid var(--chrome-border);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--chrome-muted);
+}
+
+/* ── Main ─────────────────────────────────────────────────── */
+.main { flex: 1; overflow-y: auto; overflow-x: auto; position: relative; background: var(--bg); min-height: 0; }
+
+/* ── Triage Status Pill ───────────────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  white-space: nowrap;
+}
+.pill-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.pill-unread   { color: #fff; background: #334155; }
+.pill-unread .pill-dot   { background: rgba(255,255,255,.7); }
+.pill-open     { color: #fff; background: var(--amber); }
+.pill-open .pill-dot     { background: rgba(255,255,255,.7); }
+.pill-resolved { color: var(--green); background: var(--green-dim); border: 1px solid var(--green); }
+.pill-resolved .pill-dot { background: var(--green); }
+/* Triage filter active states */
+.pf-unread    { background: #334155;           color: #fff;            border-color: #334155; }
+.pf-open-ts   { background: var(--amber-dim);  color: var(--amber);    border-color: var(--amber); }
+.pf-resolved  { background: var(--green-dim);  color: var(--green);    border-color: var(--green); }
+/* Priority pills */
+.pill.ph { background: var(--red);       color: #fff; }
+.pill.pm { background: var(--amber);     color: #fff; }
+.pill.pl { background: var(--green-dim); color: var(--green); border: 1px solid var(--green); }
+/* Priority filter active states */
+.pf-high   { background: var(--red-dim);   color: var(--red);   border-color: var(--red); }
+.pf-medium { background: var(--amber-dim); color: var(--amber); border-color: var(--amber); }
+.pf-low    { background: var(--green-dim); color: var(--green); border-color: var(--green); }
+
+/* ── Status Badge ─────────────────────────────────────────── */
+.sbadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  text-transform: uppercase;
+}
+.sOpen      { color: var(--blue);   background: var(--blue-dim);   border: 1px solid rgba(26,79,156,.2); }
+.sEscalated { color: var(--red);    background: var(--red-dim);    border: 1px solid rgba(192,0,0,.2); }
+.sResolved  { color: var(--green);  background: var(--green-dim);  border: 1px solid rgba(26,122,26,.2); }
+
+/* ── Small chips ──────────────────────────────────────────── */
+.chip {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--t2);
+  background: var(--elevated);
+  border: 1px solid var(--b0);
+}
+.conv-chip {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--elevated);
+  color: var(--t2);
+  border: 1px solid var(--b0);
+  white-space: nowrap;
+  display: inline-block;
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  cursor: default;
+}
+/* Recipient chips */
+.rcpt-list { display: flex; flex-wrap: wrap; gap: 2px; }
+.rcpt-chip {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  background: var(--blue-dim);
+  color: var(--blue);
+  border: 1px solid rgba(26,79,156,.18);
+  word-break: break-all;
+}
+.cc-chip {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  background: var(--purple-dim);
+  color: var(--purple);
+  border: 1px solid rgba(107,33,168,.18);
+  word-break: break-all;
+}
+
+/* ── Table ────────────────────────────────────────────────── */
+.tbl-wrap { }
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl th {
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: var(--t2);
+  background: var(--elevated);
+  border-bottom: 2px solid var(--b0);
+  border-right: 1px solid var(--b0);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+.tbl th:last-child { border-right: none; }
+.tbl th.sortable { cursor: pointer; user-select: none; }
+.tbl th.sortable:hover { background: var(--red-light); color: var(--red); }
+.tbl td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--b0);
+  border-right: 1px solid var(--b0);
+  vertical-align: top;
+}
+.tbl td:last-child { border-right: none; }
+.tbl tbody tr { cursor: pointer; transition: background .1s; }
+.tbl tbody tr:hover { background: var(--hover); }
+.tbl tbody tr.selected { background: var(--red-light); }
+/* Subject+body cell */
+.subj-cell { min-width: 250px; }
+.subj-text {
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--t0);
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.body-text {
+  font-size: 11px;
+  color: var(--t2);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 120px;
+  overflow-y: auto;
+  margin-top: 2px;
+}
+.unread .subj-text { font-weight: 700; color: #000; }
+.unread .body-text { color: var(--t1); }
+.col-from { min-width: 140px; max-width: 180px; }
+.from-main { font-size: 12px; color: var(--t0); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; user-select: none; }
+.from-main.expanded { white-space: normal; overflow: visible; word-break: break-all; }
+.from-chevron { font-size: 8px; color: var(--t3); margin-left: 2px; }
+.from-sub  { font-size: 10px; color: var(--t3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
+.col-date  { font-size: 11px; color: var(--t1); white-space: nowrap; }
+.col-score { font-family: var(--mono); font-weight: 700; font-size: 13px; }
+.col-conv  { font-family: var(--mono); font-size: 10px; color: var(--t2); white-space: nowrap; }
+.thread-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--red);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.attach-ico { color: var(--amber); vertical-align: middle; }
+
+/* ── Editable Assignee ────────────────────────────────────── */
+.assign-cell { cursor: pointer; min-width: 110px; }
+.assign-cell:hover .assign-edit-ico { opacity: 1; }
+.assign-edit-ico { opacity: 0; transition: opacity .15s; color: var(--t3); font-size: 10px; margin-left: 4px; }
+.assign-inp {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid var(--red);
+  outline: none;
+  background: transparent;
+  font-size: 12px;
+  font-family: var(--font);
+  color: var(--t0);
+  padding: 1px 2px;
+}
+
+/* ── Buttons ──────────────────────────────────────────────── */
+.btn {
+  padding: 5px 12px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all .12s;
+  white-space: nowrap;
+  letter-spacing: .2px;
+}
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--red);    color: #fff; border-color: var(--red); }
+.btn-primary:hover { background: var(--red-hover); border-color: var(--red-hover); }
+.btn-danger  { background: #7f0000; color: #fff; border-color: #7f0000; }
+.btn-danger:hover { background: #600000; }
+.btn-success { background: var(--green);  color: #fff; }
+.btn-success:hover { background: #156415; }
+.btn-amber   { background: var(--amber);  color: #fff; }
+.btn-amber:hover { background: #a85e00; }
+.btn-purple  { background: var(--purple); color: #fff; }
+.btn-ghost   { background: var(--surface); color: var(--t0); border-color: var(--b1); }
+.btn-ghost:hover { background: var(--elevated); }
+.btn-sm { padding: 3px 9px; font-size: 11px; }
+
+/* ── Side Panel ───────────────────────────────────────────── */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.3); z-index: 200; opacity: 0; transition: opacity .2s; pointer-events: none; }
+.overlay.on { opacity: 1; pointer-events: auto; }
+.side-panel {
+  position: fixed;
+  top: 0; right: -600px;
+  width: 580px;
+  height: 100vh;
+  background: var(--surface);
+  border-left: 1px solid var(--b0);
+  box-shadow: -4px 0 24px rgba(0,0,0,.12);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  transition: right .25s cubic-bezier(.4,0,.2,1);
+}
+.side-panel.open { right: 0; }
+.sp-stripe { height: 4px; background: var(--red); flex-shrink: 0; }
+.sp-head {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--b0);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-shrink: 0;
+  background: var(--surface);
+}
+.sp-subject { font-size: 14px; font-weight: 700; line-height: 1.35; margin-bottom: 7px; color: var(--t0); }
+.sp-meta-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.sp-score { font-family: var(--mono); font-size: 12px; color: var(--t1); }
+.sp-close { background: none; border: none; color: var(--t2); cursor: pointer; padding: 3px; border-radius: 3px; transition: all .12s; flex-shrink: 0; }
+.sp-close:hover { color: var(--red); background: var(--red-light); }
+.sp-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
+
+/* Priority override select (in panel meta-grid) */
+.pri-sel {
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--b1);
+  background: var(--surface);
+  color: var(--t0);
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+.pri-sel:focus { border-color: var(--red); }
+
+/* Meta grid inside panel */
+.meta-grid { display: grid; grid-template-columns: 80px 1fr; gap: 4px 10px; font-size: 12px; margin-bottom: 14px; background: var(--elevated); border: 1px solid var(--b0); border-radius: var(--r); padding: 10px 12px; }
+.meta-k { color: var(--t2); font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: .4px; align-self: start; padding-top: 2px; }
+.meta-v { color: var(--t0); word-break: break-all; }
+.meta-v a { color: var(--blue); text-decoration: none; }
+.meta-v a:hover { text-decoration: underline; }
+
+.sp-sec-title { font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--t2); margin: 14px 0 6px; border-bottom: 1px solid var(--b0); padding-bottom: 4px; }
+.callout { background: #fffbf0; border: 1px solid #e8c96a; border-left: 3px solid var(--amber); border-radius: var(--r); padding: 9px 12px; margin-bottom: 12px; }
+.callout-label { font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--amber); margin-bottom: 3px; }
+.callout-text { color: #7a4f00; font-size: 13px; }
+.email-body { background: var(--elevated); border-radius: var(--r); border: 1px solid var(--b0); padding: 11px; font-size: 12px; line-height: 1.7; color: var(--t1); white-space: pre-wrap; overflow-y: auto; margin-bottom: 13px; font-family: Georgia, serif; }
+.sp-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+
+/* Thread list in panel */
+.thread-item { padding: 8px 10px; border-radius: var(--r); border: 1px solid var(--b0); background: var(--surface); margin-bottom: 4px; cursor: pointer; transition: all .12s; }
+.thread-item:hover { border-color: var(--red); background: var(--red-light); }
+.thread-item.active { border-color: var(--red); background: var(--red-light); border-left: 3px solid var(--red); }
+.thread-item-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 2px; }
+.thread-from { font-weight: 600; font-size: 12px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.thread-time { font-size: 10px; color: var(--t2); white-space: nowrap; }
+.thread-preview { font-size: 11px; color: var(--t2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.thread-rcpt { font-size: 10px; color: var(--t3); margin-top: 1px; }
+
+/* Audit */
+.audit-entry { padding: 7px 9px; margin-bottom: 3px; border-radius: var(--r); background: var(--elevated); border: 1px solid var(--b0); font-size: 11px; }
+.audit-head { display: flex; justify-content: space-between; margin-bottom: 1px; }
+.audit-act  { font-weight: 700; color: var(--t0); }
+.audit-time { color: var(--t3); font-family: var(--mono); font-size: 10px; }
+.audit-detail { color: var(--t2); }
+
+/* ── Threads View ─────────────────────────────────────────── */
+.thread-group { border-bottom: 1px solid var(--b0); cursor: pointer; transition: background .1s; background: var(--surface); }
+.thread-group:hover { background: var(--hover); }
+.thread-group-header { display: flex; align-items: center; gap: 9px; padding: 9px 14px; }
+.tg-arr { color: var(--t3); transition: transform .2s; flex-shrink: 0; }
+.tg-arr.open { transform: rotate(90deg); color: var(--red); }
+.tg-subj { font-weight: 500; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tg-body-prev { font-size: 11px; color: var(--t2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 1px; }
+.tg-parts { font-size: 11px; color: var(--t1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tg-unread .tg-subj { font-weight: 700; }
+.thread-msgs { display: none; border-top: 1px solid var(--b0); background: var(--elevated); }
+.thread-msgs.open { display: block; }
+.thread-msg { display: flex; align-items: flex-start; gap: 9px; padding: 8px 14px 8px 38px; border-bottom: 1px solid var(--b0); cursor: pointer; transition: background .1s; }
+.thread-msg:last-child { border-bottom: none; }
+.thread-msg:hover { background: var(--hover); }
+.tm-num { font-family: var(--mono); font-size: 10px; color: var(--t3); padding-top: 2px; flex-shrink: 0; width: 20px; }
+.tm-body { flex: 1; min-width: 0; }
+.tm-row1 { display: flex; align-items: center; gap: 7px; margin-bottom: 2px; flex-wrap: wrap; }
+.tm-from { font-weight: 700; font-size: 12px; }
+.tm-to   { font-size: 11px; color: var(--t2); }
+.tm-preview { font-size: 11px; color: var(--t1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tm-date { font-size: 10px; color: var(--t2); white-space: nowrap; margin-left: auto; flex-shrink: 0; }
+
+/* ── Kanban ───────────────────────────────────────────────── */
+.kanban-wrap { display: flex; gap: 14px; padding: 16px 20px; align-items: flex-start; min-height: 100%; }
+.k-col { flex: 1; min-width: 250px; background: var(--surface); border-radius: var(--r); border: 1px solid var(--b0); border-top: 3px solid var(--b1); padding: 12px; }
+.k-col.k-unread   { border-top-color: #334155; }
+.k-col.k-open     { border-top-color: var(--amber); }
+.k-col.k-resolved { border-top-color: var(--green); }
+.k-col.drop-over { outline: 2px dashed var(--red); outline-offset: -2px; }
+.k-head { display: flex; align-items: center; gap: 7px; margin-bottom: 11px; }
+.k-cnt  { font-size: 12px; font-weight: 600; color: var(--t2); }
+.k-card { background: var(--surface); border-radius: var(--r); border: 1px solid var(--b0); border-left: 3px solid var(--b1); padding: 10px; margin-bottom: 7px; cursor: grab; transition: all .12s; }
+.k-unread   .k-card { border-left-color: #334155; }
+.k-open     .k-card { border-left-color: var(--amber); }
+.k-resolved .k-card { border-left-color: var(--green); }
+.k-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+.k-card:active { cursor: grabbing; }
+.k-card.dragging { opacity: .35; }
+.k-card-title  { font-size: 12px; font-weight: 600; margin-bottom: 3px; line-height: 1.35; }
+.k-card-body   { font-size: 11px; color: var(--t2); margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-card-from   { font-size: 11px; color: var(--t1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-card-to     { font-size: 10px; color: var(--t2); margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-card-meta   { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 7px; }
+.k-card-foot   { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+.k-card-score  { font-family: var(--mono); font-size: 12px; font-weight: 700; }
+.k-empty       { text-align: center; padding: 20px; color: var(--t3); font-size: 12px; }
+
+/* ── Work Queue ───────────────────────────────────────────── */
+.q-stats  { display: flex; gap: 10px; padding: 14px 20px 10px; flex-wrap: wrap; align-items: center; }
+.q-stat   { padding: 10px 16px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--b0); border-top: 3px solid var(--red); }
+.q-stat-val   { font-size: 22px; font-weight: 700; font-family: var(--mono); color: var(--red); }
+.q-stat-label { font-size: 10px; color: var(--t2); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+.q-bulk { display: flex; gap: 6px; align-items: center; }
+
+/* ── Analytics ────────────────────────────────────────────── */
+.an-grid { display: flex; gap: 10px; padding: 16px 20px 12px; flex-wrap: wrap; }
+.an-kpi  { flex: 1; min-width: 120px; padding: 12px 16px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--b0); border-top: 3px solid var(--b1); }
+.an-val   { font-size: 26px; font-weight: 700; font-family: var(--mono); }
+.an-label { font-size: 10px; color: var(--t2); margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; }
+.chart-card { margin: 0 20px 20px; padding: 16px 18px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--b0); }
+.chart-title { font-size: 13px; font-weight: 700; margin-bottom: 12px; color: var(--t0); }
+.chart-bars  { display: flex; align-items: flex-end; gap: 3px; height: 90px; }
+.chart-bar   { flex: 1; border-radius: 2px 2px 0 0; min-width: 3px; transition: height .3s; }
+.chart-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--t3); margin-top: 4px; }
+
+/* ── Modal ────────────────────────────────────────────────── */
+.modal-wrap { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 400; display: none; align-items: center; justify-content: center; }
+.modal-wrap.on { display: flex; }
+.modal { background: var(--surface); border-radius: var(--r); border: 1px solid var(--b1); border-top: 3px solid var(--red); padding: 22px; width: 360px; max-width: 92vw; box-shadow: 0 8px 32px rgba(0,0,0,.2); animation: mIn .2s ease; }
+@keyframes mIn { from{transform:scale(.96) translateY(8px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
+.modal-title { font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--t0); }
+.modal-label { font-size: 11px; font-weight: 700; color: var(--t2); text-transform: uppercase; letter-spacing: .4px; display: block; margin-bottom: 5px; }
+.modal-sel, .modal-ta { width: 100%; padding: 7px 10px; border-radius: var(--r); border: 1px solid var(--b1); background: var(--surface); color: var(--t0); font-family: var(--font); font-size: 12px; margin-bottom: 12px; outline: none; }
+.modal-sel:focus, .modal-ta:focus { border-color: var(--red); }
+.modal-ta { height: 60px; resize: vertical; }
+.modal-foot { display: flex; gap: 7px; justify-content: flex-end; }
+
+/* ── Toast ────────────────────────────────────────────────── */
+#toasts { position: fixed; top: 14px; right: 14px; z-index: 999; display: flex; flex-direction: column; gap: 7px; }
+.toast { padding: 9px 16px; border-radius: var(--r); font-size: 12px; font-weight: 600; color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,.25); animation: tIn .25s ease; max-width: 320px; }
+.t-success { background: var(--green); }
+.t-error   { background: var(--red); }
+.t-info    { background: var(--blue); }
+@keyframes tIn { from{transform:translateX(28px);opacity:0} to{transform:translateX(0);opacity:1} }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.75)} }
+
+/* ── Checkbox ─────────────────────────────────────────────── */
+.chk { appearance: none; width: 14px; height: 14px; border: 1.5px solid var(--b1); border-radius: 3px; background: var(--surface); cursor: pointer; position: relative; transition: all .12s; }
+.chk:checked { background: var(--red); border-color: var(--red); }
+.chk:checked::after { content: '✓'; position: absolute; top: -2px; left: 1px; font-size: 10px; color: #fff; font-weight: 700; }
+
+/* ── Section header for queue/analytics ──────────────────── */
+.panel-wrap { padding: 0 20px 20px; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media(max-width:700px){
+  .hdr { padding: 0 12px; }
+  .tbar { padding: 6px 12px; }
+  .crm-logo { font-size: 15px; }
+  .side-panel { width: 100%; right: -100%; }
+  .k-col { min-width: 200px; }
+}
+</style>
+<style type="text/css" id="operaUserStyle"></style><style type="text/css"></style></head>
+<body>
+<div id="app">
+  <div id="toasts"></div>
+
+  <!-- ── Red top stripe ─────────────────────────────────── -->
+  <div class="top-stripe"></div>
+
+  <!-- ── Header ─────────────────────────────────────────── -->
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="crm-logo">
+        <span class="word1">Credit</span><span class="word2">Risk</span><span class="word3">Monitor</span>
+      </div>
+      <div class="hdr-divider"></div>
+      <div class="hdr-section">Portal Support Triage</div>
+    </div>
+    <div class="hdr-right">
+      <label class="toggle-wrap"><input type="checkbox" id="hideAutoEmails" checked="" onchange="render()"> Hide Auto Emails</label>
+      <label class="toggle-wrap"><input type="checkbox" id="dryRun" checked=""> Dry Run</label>
+      <label class="toggle-wrap"><input type="checkbox" id="syncOutlook"> Sync Outlook</label>
+      <select class="role-sel" id="roleSelect">
+        <option value="Manager">Manager</option>
+        <option value="Analyst">Analyst</option>
+        <option value="Viewer">Viewer</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ── Toolbar ────────────────────────────────────────── -->
+  <div class="tbar">
+    <div class="nav-grp">
+      <button class="nav-btn active" data-view="inbox" onclick="switchView(&#39;inbox&#39;)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><circle cx="3.5" cy="6" r="1.5" fill="currentColor"></circle><circle cx="3.5" cy="12" r="1.5" fill="currentColor"></circle><circle cx="3.5" cy="18" r="1.5" fill="currentColor"></circle></svg>
+        Inbox
+      </button>
+      <button class="nav-btn" data-view="threads" onclick="switchView(&#39;threads&#39;)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path></svg>
+        Threads
+      </button>
+      <button class="nav-btn" data-view="kanban" onclick="switchView(&#39;kanban&#39;)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        Kanban
+      </button>
+      <button class="nav-btn" data-view="queue" onclick="switchView(&#39;queue&#39;)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        Work Queue
+      </button>
+      <button class="nav-btn" data-view="analytics" onclick="switchView(&#39;analytics&#39;)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        Analytics
+      </button>
+    </div>
+    <div class="tbar-div"></div>
+    <div class="search-box">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input class="search-inp" id="searchInput" placeholder="Subject, sender, recipient, body…" oninput="render()">
+    </div>
+    <select class="flt-sel" id="fltCompany" onchange="render()"><option value="">All Companies</option><option value="Mill Rock Packaging Inc.">Mill Rock Packaging Inc.</option><option value="ASJ Holdings Ltd">ASJ Holdings Ltd</option><option value="Interpak BTM">Interpak BTM</option><option value="Clico.pl">Clico.pl</option></select>
+    <select class="flt-sel" id="fltAssigned" onchange="render()"><option value="">All Assignees</option><option value="triage@financials">triage@financials</option><option value="david.holland">david.holland</option><option value="richard.narine">richard.narine</option><option value="ops@financials">ops@financials</option></select>
+    <button class="pf-btn" id="pfUnread" onclick="toggleTF(&#39;unread&#39;)">Unread</button>
+    <button class="pf-btn" id="pfOpen" onclick="toggleTF(&#39;open&#39;)">Open</button>
+    <button class="pf-btn" id="pfResolved" onclick="toggleTF(&#39;resolved&#39;)">Resolved</button>
+    <div class="tbar-div"></div>
+    <button class="pf-btn" id="pfHigh" onclick="togglePF(&#39;High&#39;)">High</button>
+    <button class="pf-btn" id="pfMedium" onclick="togglePF(&#39;Medium&#39;)">Medium</button>
+    <button class="pf-btn" id="pfLow" onclick="togglePF(&#39;Low&#39;)">Low</button>
+    <div class="tbar-info" id="tbarInfo">6 emails · <kbd>i</kbd> Inbox <kbd>t</kbd> Threads <kbd>k</kbd> Kanban</div>
+    <div class="tbar-div"></div>
+    <button class="btn btn-ghost btn-sm" id="btnWebhook" onclick="openWebhookPanel()" style="gap:5px">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"></path></svg>
+      Webhook
+      <span class="pulse-dot" id="swDot" style="width: 7px; height: 7px; border-radius: 50%; background: var(--green); display: inline-block; flex-shrink: 0; animation: 2s ease 0s infinite normal none running pulse;"></span>
+    </button>
+  </div>
+
+  <!-- ── Main ───────────────────────────────────────────── -->
+  <div class="main" id="mainContent"><div class="tbl-wrap"><table class="tbl"><thead><tr>
+    <th style="width:36px"></th>
+    <th style="width:28px;text-align:center">#</th>
+    <th style="width:80px">Priority</th>
+    <th style="width:90px">Conversation ID</th>
+    <th class="sortable" onclick="setSort(&#39;sender&#39;)" style="min-width:140px">Sender</th>
+    <th style="min-width:220px">Recipients (To + CC)</th>
+    <th class="sortable" onclick="setSort(&#39;subject&#39;)" style="min-width:250px">Subject</th>
+    <th style="min-width:100px">Company</th>
+    <th style="min-width:200px">Body</th>
+    <th style="width:26px" title="Attachments">📎</th>
+    <th style="min-width:120px">Assigned</th>
+    <th class="sortable" onclick="setSort(&#39;triage&#39;)" style="width:100px">Status</th>
+    <th class="sortable" onclick="setSort(&#39;date&#39;)" style="width:110px">Received ↓</th>
+    <th style="min-width:110px">Date Resolved</th>
+  </tr></thead><tbody><tr class="" onclick="openDetail(&#39;MSG-008&#39;)">
+      <td style="text-align:center" onclick="event.stopPropagation()">
+        <button title="Delete email" onclick="deleteEmail(&#39;MSG-008&#39;)" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;padding:2px 4px;border-radius:3px;line-height:1" onmouseover="this.style.color=&#39;var(--red)&#39;;this.style.background=&#39;var(--red-dim)&#39;" onmouseout="this.style.color=&#39;var(--t3)&#39;;this.style.background=&#39;none&#39;">🗑</button>
+      </td>
+      <td style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--t3)">MSG-008</td>
+      <td><span class="pill ph">High</span></td>
+      <td class="col-conv">
+        <span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAL9wJm5eU6XDsN4hFc2vYQ3=">AAQkADAx…2vYQ3=</span>
+        
+      </td>
+      <td class="col-from">
+        <div class="from-main" onclick="toggleSenderExpand(this,event)" title="risk.central.support@philips.onmicrosoft.com">risk.central.support@philips.onmicrosoft.com<span class="from-chevron"> ▼</span></div>
+      </td>
+      <td><div class="rcpt-list"><span class="rcpt-chip" title="ops@financials">ops@financials</span><span class="cc-chip" title="triage@financials">CC: triage@financials</span><span class="cc-chip" title="richard.narine">CC: richard.narine</span></div></td>
+      <td class="subj-cell">
+        <div class="subj-text">
+          Confidential Financial Statement Upload for ASJ Holdings Ltd
+          
+        </div>
+      </td>
+      <td style="font-weight:600;font-size:12px;white-space:nowrap">ASJ Holdings Ltd</td>
+      <td style="min-width:200px">
+        <div class="body-text">Portal Notification:
+
+A confidential financial statement has been uploaded for ASJ Holdings Ltd through the portal functional account. Please confirm acknowledgement and verify processing status.</div>
+      </td>
+      <td style="text-align:center"></td>
+      <td class="assign-cell" onclick="event.stopPropagation();startEditAssignee(&#39;MSG-008&#39;,this)">
+        <span>ops@financials</span>
+        <span class="assign-edit-ico">✏</span>
+      </td>
+      <td><span class="pill pill-open"><span class="pill-dot"></span>OPEN</span></td>
+      <td class="col-date">Mar 11, 7:12 AM</td>
+      <td class="col-date"><span style="color:var(--t3)">—</span></td>
+    </tr><tr class="unread" onclick="openDetail(&#39;MSG-007&#39;)">
+      <td style="text-align:center" onclick="event.stopPropagation()">
+        <button title="Delete email" onclick="deleteEmail(&#39;MSG-007&#39;)" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;padding:2px 4px;border-radius:3px;line-height:1" onmouseover="this.style.color=&#39;var(--red)&#39;;this.style.background=&#39;var(--red-dim)&#39;" onmouseout="this.style.color=&#39;var(--t3)&#39;;this.style.background=&#39;none&#39;">🗑</button>
+      </td>
+      <td style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--t3)">MSG-007</td>
+      <td><span class="pill pl">Low</span></td>
+      <td class="col-conv">
+        <span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAKdP3Gx8S2NcvE7bRm1qTF4=">AAQkADAx…1qTF4=</span>
+        <div style="margin-top:2px"><span class="thread-count" title="2 messages">2</span> <span style="font-size:10px;color:var(--t2)">msgs</span></div>
+      </td>
+      <td class="col-from">
+        <div class="from-main" onclick="toggleSenderExpand(this,event)" title="CGulick@creditriskmonitor.com">CGulick@creditriskmonitor.com<span class="from-chevron"> ▼</span></div>
+      </td>
+      <td><div class="rcpt-list"><span class="rcpt-chip" title="triage@financials">triage@financials</span><span class="rcpt-chip" title="david.holland">david.holland</span><span class="cc-chip" title="ops@financials">CC: ops@financials</span></div></td>
+      <td class="subj-cell">
+        <div class="subj-text">
+          RE: RE: Invitation to Upload Financial Statements
+          <span style="margin-left:3px"><svg class="attach-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"></path></svg></span>
+        </div>
+      </td>
+      <td style="font-weight:600;font-size:12px;white-space:nowrap">Interpak BTM</td>
+      <td style="min-width:200px">
+        <div class="body-text">Continued thread regarding Interpak BTM financial statement upload.
+
+Multiple portal responses have been received. Please resolve the threaded questions and confirm the final upload status.</div>
+      </td>
+      <td style="text-align:center"><svg class="attach-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"></path></svg></td>
+      <td class="assign-cell" onclick="event.stopPropagation();startEditAssignee(&#39;MSG-007&#39;,this)">
+        <span>triage@financials</span>
+        <span class="assign-edit-ico">✏</span>
+      </td>
+      <td><span class="pill pill-unread"><span class="pill-dot"></span>UNREAD</span></td>
+      <td class="col-date">Mar 11, 8:45 AM</td>
+      <td class="col-date"><span style="color:var(--t3)">—</span></td>
+    </tr><tr class="" onclick="openDetail(&#39;MSG-004&#39;)">
+      <td style="text-align:center" onclick="event.stopPropagation()">
+        <button title="Delete email" onclick="deleteEmail(&#39;MSG-004&#39;)" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;padding:2px 4px;border-radius:3px;line-height:1" onmouseover="this.style.color=&#39;var(--red)&#39;;this.style.background=&#39;var(--red-dim)&#39;" onmouseout="this.style.color=&#39;var(--t3)&#39;;this.style.background=&#39;none&#39;">🗑</button>
+      </td>
+      <td style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--t3)">MSG-004</td>
+      <td><span class="pill pl">Low</span></td>
+      <td class="col-conv">
+        <span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAFUyuwdVxIxNnZ85yyr4BX0=">AAQkADAx…r4BX0=</span>
+        <div style="margin-top:2px"><span class="thread-count" title="2 messages">2</span> <span style="font-size:10px;color:var(--t2)">msgs</span></div>
+      </td>
+      <td class="col-from">
+        <div class="from-main" onclick="toggleSenderExpand(this,event)" title="kgruenwald@creditriskmonitor.com">kgruenwald@creditriskmonitor.com<span class="from-chevron"> ▼</span></div>
+      </td>
+      <td><div class="rcpt-list"><span class="rcpt-chip" title="richard.narine">richard.narine</span><span class="rcpt-chip" title="ops@financials">ops@financials</span><span class="cc-chip" title="triage@financials">CC: triage@financials</span></div></td>
+      <td class="subj-cell">
+        <div class="subj-text">
+          Action Required: Issue Processing Your Financial Statement Upload
+          
+        </div>
+      </td>
+      <td style="font-weight:600;font-size:12px;white-space:nowrap">ASJ Holdings Ltd</td>
+      <td style="min-width:200px">
+        <div class="body-text">URGENT: We encountered an issue while processing the PDF financial statement upload for ASJ Holdings Ltd.
+
+Error Details:
+- File: ASJ_Holdings_FY2025.pdf
+- Error: PDF parsing failed on page 3
+- Timestamp: 2026-03-11T12:55:00Z
+
+Please investigate and request a re-upload if necessary.</div>
+      </td>
+      <td style="text-align:center"></td>
+      <td class="assign-cell" onclick="event.stopPropagation();startEditAssignee(&#39;MSG-004&#39;,this)">
+        <span>richard.narine</span>
+        <span class="assign-edit-ico">✏</span>
+      </td>
+      <td><span class="pill pill-open"><span class="pill-dot"></span>OPEN</span></td>
+      <td class="col-date">Mar 11, 8:56 AM</td>
+      <td class="col-date"><span style="color:var(--t3)">—</span></td>
+    </tr><tr class="" onclick="openDetail(&#39;MSG-006&#39;)">
+      <td style="text-align:center" onclick="event.stopPropagation()">
+        <button title="Delete email" onclick="deleteEmail(&#39;MSG-006&#39;)" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;padding:2px 4px;border-radius:3px;line-height:1" onmouseover="this.style.color=&#39;var(--red)&#39;;this.style.background=&#39;var(--red-dim)&#39;" onmouseout="this.style.color=&#39;var(--t3)&#39;;this.style.background=&#39;none&#39;">🗑</button>
+      </td>
+      <td style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--t3)">MSG-006</td>
+      <td><span class="pill pl">Low</span></td>
+      <td class="col-conv">
+        <span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAKdP3Gx8S2NcvE7bRm1qTF4=">AAQkADAx…1qTF4=</span>
+        <div style="margin-top:2px"><span class="thread-count" title="2 messages">2</span> <span style="font-size:10px;color:var(--t2)">msgs</span></div>
+      </td>
+      <td class="col-from">
+        <div class="from-main" onclick="toggleSenderExpand(this,event)" title="CGulick@creditriskmonitor.com">CGulick@creditriskmonitor.com<span class="from-chevron"> ▼</span></div>
+      </td>
+      <td><div class="rcpt-list"><span class="rcpt-chip" title="triage@financials">triage@financials</span></div></td>
+      <td class="subj-cell">
+        <div class="subj-text">
+          RE: Invitation to Upload Financial Statements
+          <span style="margin-left:3px"><svg class="attach-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"></path></svg></span>
+        </div>
+      </td>
+      <td style="font-weight:600;font-size:12px;white-space:nowrap">Interpak BTM</td>
+      <td style="min-width:200px">
+        <div class="body-text">Forwarded from Risk.central.support:
+
+Please find attached the financial statements PDF for Interpak BTM. Verify the content and confirm upload through the portal.</div>
+      </td>
+      <td style="text-align:center"><svg class="attach-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"></path></svg></td>
+      <td class="assign-cell" onclick="event.stopPropagation();startEditAssignee(&#39;MSG-006&#39;,this)">
+        <span>triage@financials</span>
+        <span class="assign-edit-ico">✏</span>
+      </td>
+      <td><span class="pill pill-open"><span class="pill-dot"></span>OPEN</span></td>
+      <td class="col-date">Mar 11, 9:02 AM</td>
+      <td class="col-date"><span style="color:var(--t3)">—</span></td>
+    </tr><tr class="unread" onclick="openDetail(&#39;MSG-005&#39;)">
+      <td style="text-align:center" onclick="event.stopPropagation()">
+        <button title="Delete email" onclick="deleteEmail(&#39;MSG-005&#39;)" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;padding:2px 4px;border-radius:3px;line-height:1" onmouseover="this.style.color=&#39;var(--red)&#39;;this.style.background=&#39;var(--red-dim)&#39;" onmouseout="this.style.color=&#39;var(--t3)&#39;;this.style.background=&#39;none&#39;">🗑</button>
+      </td>
+      <td style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--t3)">MSG-005</td>
+      <td><span class="pill pl">Low</span></td>
+      <td class="col-conv">
+        <span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAFUyuwdVxIxNnZ85yyr4BX0=">AAQkADAx…r4BX0=</span>
+        <div style="margin-top:2px"><span class="thread-count" title="2 messages">2</span> <span style="font-size:10px;color:var(--t2)">msgs</span></div>
+      </td>
+      <td class="col-from">
+        <div class="from-main" onclick="toggleSenderExpand(this,event)" title="dholland@creditriskmonitor.com">dholland@creditriskmonitor.com<span class="from-chevron"> ▼</span></div>
+      </td>
+      <td><div class="rcpt-list"><span class="rcpt-chip" title="ops@financials">ops@financials</span><span class="rcpt-chip" title="richard.narine">richard.narine</span><span class="cc-chip" title="triage@financials">CC: triage@financials</span></div></td>
+      <td class="subj-cell">
+        <div class="subj-text">
+          RE: Confidential Financial Statement Upload for ASJ Holdings Ltd
+          
+        </div>
+      </td>
+      <td style="font-weight:600;font-size:12px;white-space:nowrap">ASJ Holdings Ltd</td>
+      <td style="min-width:200px">
+        <div class="body-text">David Holland forwarded:
+
+Original thread from Risk.central.support regarding the ASJ Holdings Ltd financial statement upload. The portal functional account needs follow-up to confirm receipt and processing status.</div>
+      </td>
+      <td style="text-align:center"></td>
+      <td class="assign-cell" onclick="event.stopPropagation();startEditAssignee(&#39;MSG-005&#39;,this)">
+        <span>david.holland</span>
+        <span class="assign-edit-ico">✏</span>
+      </td>
+      <td><span class="pill pill-unread"><span class="pill-dot"></span>UNREAD</span></td>
+      <td class="col-date">Mar 11, 9:17 AM</td>
+      <td class="col-date"><span style="color:var(--t3)">—</span></td>
+    </tr><tr class="" onclick="openDetail(&#39;MSG-009&#39;)">
+      <td style="text-align:center" onclick="event.stopPropagation()">
+        <button title="Delete email" onclick="deleteEmail(&#39;MSG-009&#39;)" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;padding:2px 4px;border-radius:3px;line-height:1" onmouseover="this.style.color=&#39;var(--red)&#39;;this.style.background=&#39;var(--red-dim)&#39;" onmouseout="this.style.color=&#39;var(--t3)&#39;;this.style.background=&#39;none&#39;">🗑</button>
+      </td>
+      <td style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--t3)">MSG-009</td>
+      <td><span class="pill pl">Low</span></td>
+      <td class="col-conv">
+        <span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAZx6KpT1W8MbqD5nRe9sGH2=">AAQkADAx…9sGH2=</span>
+        
+      </td>
+      <td class="col-from">
+        <div class="from-main" onclick="toggleSenderExpand(this,event)" title="PortalSupport@creditriskmonitor.com">PortalSupport@creditriskmonitor.com<span class="from-chevron"> ▼</span></div>
+      </td>
+      <td><div class="rcpt-list"><span class="rcpt-chip" title="triage@financials">triage@financials</span></div></td>
+      <td class="subj-cell">
+        <div class="subj-text">
+          Unified CFS - Business Info Details
+          
+        </div>
+      </td>
+      <td style="font-weight:600;font-size:12px;white-space:nowrap">Clico.pl</td>
+      <td style="min-width:200px">
+        <div class="body-text">Business Info Update:
+
+The following business information has been updated for Clico.pl in the Unified CFS system. Please verify if there is a mismatch with the CRM records.</div>
+      </td>
+      <td style="text-align:center"></td>
+      <td class="assign-cell" onclick="event.stopPropagation();startEditAssignee(&#39;MSG-009&#39;,this)">
+        <span><span style="color:var(--t3)">Unassigned</span></span>
+        <span class="assign-edit-ico">✏</span>
+      </td>
+      <td><span class="pill pill-open"><span class="pill-dot"></span>OPEN</span></td>
+      <td class="col-date">Mar 11, 12:38 PM</td>
+      <td class="col-date"><span style="color:var(--t3)">—</span></td>
+    </tr></tbody></table></div></div>
+</div>
+
+<!-- ── Webhook Panel ──────────────────────────────────────── -->
+<div class="modal-wrap" id="webhookPanel">
+  <div class="modal" style="width:600px;max-width:96vw;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <div class="modal-title" style="margin:0">Webhook Setup &amp; Test</div>
+      <button class="sp-close" onclick="closeModal(&#39;webhookPanel&#39;)" style="margin-left:8px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <p style="font-size:12px;color:var(--t2);margin-bottom:14px">Connect your n8n workflow using the URL below. The Service Worker intercepts POST requests and feeds emails directly into this dashboard (requires HTTPS or localhost).</p>
+
+    <div style="margin-bottom:14px">
+      <label class="modal-label">Your Webhook URL</label>
+      <div style="display:flex;gap:7px;align-items:center">
+        <div id="whUrlBox" style="flex:1;padding:6px 10px;border:1px solid var(--b1);border-radius:var(--r);background:var(--elevated);font-family:var(--mono);font-size:11px;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">http://127.0.0.1:5500/webhook</div>
+        <button class="btn btn-primary btn-sm" onclick="copyWhUrl()">Copy</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:7px;font-size:11px;color:var(--t2)">
+        <span class="pulse-dot" id="swStatusDot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; flex-shrink: 0; animation: 2s ease 0s infinite normal none running pulse;"></span>
+        <span id="swStatusLabel">Service Worker active — webhook ready at URL above</span>
+      </div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--b0);margin:14px 0">
+
+    <div style="margin-bottom:14px">
+      <label class="modal-label">n8n HTTP Request Node — Body (JSON)</label>
+      <div style="position:relative">
+        <pre id="n8nSnippet" style="background:var(--elevated);border:1px solid var(--b0);border-radius:var(--r);padding:10px 36px 10px 12px;font-family:var(--mono);font-size:11px;line-height:1.6;overflow-x:auto;white-space:pre;color:var(--t0)">{
+  "id":           "{{ $json.messageId }}",
+  "sender":       "{{ $json.from }}",
+  "to":           ["{{ $json.to }}"],
+  "cc":           ["{{ $json.cc }}"],
+  "subject":      "{{ $json.subject }}",
+  "body_preview": "{{ $json.text | truncate(200) }}",
+  "full_body":    "{{ $json.text }}",
+  "company":      "{{ $json.company }}",
+  "conversation_id": "{{ $json.threadId }}",
+  "timestamp":    "{{ $now.toISO() }}"
+}</pre>
+        <button class="btn btn-ghost btn-sm" onclick="copyCode(&#39;n8nSnippet&#39;)" style="position:absolute;top:6px;right:6px;font-size:10px">Copy</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <label class="modal-label">n8n Function Node — Priority Classifier</label>
+      <div style="position:relative">
+        <pre id="fnSnippet" style="background:var(--elevated);border:1px solid var(--b0);border-radius:var(--r);padding:10px 36px 10px 12px;font-family:var(--mono);font-size:11px;line-height:1.6;overflow-x:auto;white-space:pre;color:var(--t0)">// Triage status is auto-computed from conversation thread.
+// A conversation is "addressed" if any team member (@creditriskmonitor.com)
+// has replied to it. Otherwise it's "needs_attention".
+// No manual classification needed — just pass through the email fields.
+
+return [{
+  json: {
+    ...items[0].json,
+    threadId: $json.conversationId || $json.threadId || $json.ConversationId || ''
+  }
+}];</pre>
+        <button class="btn btn-ghost btn-sm" onclick="copyCode(&#39;fnSnippet&#39;)" style="position:absolute;top:6px;right:6px;font-size:10px">Copy</button>
+      </div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--b0);margin:14px 0">
+
+    <label class="modal-label" style="margin-bottom:10px;display:block">Add Test Email Manually</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div>
+        <label class="modal-label">Sender *</label>
+        <input class="modal-sel" id="tSender" placeholder="john@example.com" oninput="(function(v){var s=document.getElementById(&#39;tPriority&#39;);if(s)s.value=autoPriority(v);})(this.value)">
+      </div>
+      <div>
+        <label class="modal-label">Triage Status</label>
+        <select class="modal-sel" id="tTriageStatus">
+          <option value="unread" selected="">Unread</option>
+          <option value="open">Open</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      </div>
+      <div>
+        <label class="modal-label">Priority</label>
+        <select class="modal-sel" id="tPriority">
+          <option value="High">High</option>
+          <option value="Medium" selected="">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+      <div>
+        <label class="modal-label">Recipient (To)</label>
+        <input class="modal-sel" id="tTo" placeholder="ops@financials">
+      </div>
+      <div>
+        <label class="modal-label">Recipient 2 (CC)</label>
+        <input class="modal-sel" id="tCc" placeholder="triage@financials">
+      </div>
+      <div style="grid-column:1/-1">
+        <label class="modal-label">Subject *</label>
+        <input class="modal-sel" id="tSubject" placeholder="Re: Financial Statement Upload">
+      </div>
+      <div style="grid-column:1/-1">
+        <label class="modal-label">Body</label>
+        <textarea class="modal-ta" id="tBody" style="height:70px" placeholder="Email body text…"></textarea>
+      </div>
+      <div>
+        <label class="modal-label">Company</label>
+        <input class="modal-sel" id="tCompany" placeholder="ASJ Holdings Ltd">
+      </div>
+      <div>
+        <label class="modal-label">Conversation ID</label>
+        <input class="modal-sel" id="tConvId" placeholder="AAQkADAxNmRl…BX0=">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-primary" onclick="addTestEmail()">Add Email</button>
+      <button class="btn btn-ghost" onclick="addSampleEmails()">Load 6 Samples</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Overlay + Side Panel ───────────────────────────────── -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="side-panel" id="sidePanel">
+    <div class="sp-stripe"></div>
+    <div class="sp-head">
+      <div style="flex:1;min-width:0">
+        <div class="sp-subject">Confidential Financial Statement Upload for ASJ Holdings Ltd</div>
+        <div class="sp-meta-row">
+          <span class="pill pill-open"><span class="pill-dot"></span>OPEN</span>
+          <span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAL9wJm5eU6XDsN4hFc2vYQ3=">AAQkADAx…2vYQ3=</span>
+          
+        </div>
+      </div>
+      <button class="sp-close" onclick="closePanel()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <div class="sp-body">
+
+      <div class="meta-grid">
+        <span class="meta-k">Priority</span>
+        <span class="meta-v" style="display:flex;align-items:center;gap:7px">
+          <span class="pill ph">High</span>
+          <select class="pri-sel" onclick="event.stopPropagation()" onchange="setPriority(&#39;MSG-008&#39;,this.value)">
+            <option value="High" selected="">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </span>
+
+        <span class="meta-k">Status</span>
+        <span class="meta-v"><span class="pill pill-open"><span class="pill-dot"></span>OPEN</span></span>
+
+        <span class="meta-k">From</span>
+        <span class="meta-v">risk.central.support@philips.onmicrosoft.com</span>
+
+        <span class="meta-k">To</span>
+        <span class="meta-v">
+          <span style="display:inline-block;margin:1px 4px 1px 0;padding:1px 6px;border-radius:3px;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(26,79,156,.2);font-size:11px">ops@financials</span>
+        </span>
+
+        
+        <span class="meta-k">CC</span>
+        <span class="meta-v">
+          <span style="display:inline-block;margin:1px 4px 1px 0;padding:1px 6px;border-radius:3px;background:var(--elevated);color:var(--t1);border:1px solid var(--b0);font-size:11px">triage@financials</span><span style="display:inline-block;margin:1px 4px 1px 0;padding:1px 6px;border-radius:3px;background:var(--elevated);color:var(--t1);border:1px solid var(--b0);font-size:11px">richard.narine</span>
+        </span>
+
+        <span class="meta-k">Received</span>
+        <span class="meta-v">3/11/2026, 7:12:34 AM</span>
+
+        <span class="meta-k">Company</span>
+        <span class="meta-v" style="font-weight:700">ASJ Holdings Ltd</span>
+
+        <span class="meta-k">Conv ID</span>
+        <span class="meta-v"><span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAL9wJm5eU6XDsN4hFc2vYQ3=">AAQkADAx…2vYQ3=</span></span>
+
+        <span class="meta-k">Assigned</span>
+        <span class="meta-v assign-cell" style="cursor:pointer" onclick="startEditPanelAssignee(&#39;MSG-008&#39;,this)">
+          <span>ops@financials</span>
+          <span class="assign-edit-ico">✏</span>
+        </span>
+
+        <span class="meta-k">Outlook</span>
+        <span class="meta-v"><a href="https://outlook/.../MSG-008" target="_blank">Open in Outlook ↗</a></span>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Suggested Action</div>
+        <div class="callout-text">Confirm portal acknowledgements</div>
+      </div>
+
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px"><span class="chip">portal</span></div>
+
+      <div class="sp-sec-title">Email Body</div>
+      <div class="email-body">Portal Notification:
+
+A confidential financial statement has been uploaded for ASJ Holdings Ltd through the portal functional account. Please confirm acknowledgement and verify processing status.</div>
+
+      <div class="sp-actions">
+        <button class="btn btn-amber btn-sm" onclick="openPriModal()">Set Status</button>
+        <button class="btn btn-ghost btn-sm" onclick="doMoveTag()">Move/Tag</button>
+        <button class="btn btn-success btn-sm" onclick="doResolve()">Resolve</button>
+        <button class="btn btn-ghost btn-sm" onclick="doRerun()">Re-classify</button>
+        <button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid rgba(192,0,0,.2)" onclick="deleteEmail(&#39;MSG-008&#39;)">Delete</button>
+      </div>
+
+      
+
+      <div class="sp-sec-title">Audit Log</div>
+      <div style="font-size:11px;color:var(--t3)">No events yet</div>
+      
+    </div></div>
+
+<!-- ── Modals ─────────────────────────────────────────────── -->
+<div class="modal-wrap" id="assignModal">
+  <div class="modal">
+    <div class="modal-title">Assign Email</div>
+    <label class="modal-label">Assign to</label>
+    <select class="modal-sel" id="assignSel">
+      <option value="">— Unassigned —</option>
+      <option value="richard.narine">richard.narine</option>
+      <option value="david.holland">david.holland</option>
+      <option value="triage@financials">triage@financials</option>
+      <option value="ops@financials">ops@financials</option>
+      <option value="kgruenwald">kgruenwald</option>
+    </select>
+    <label class="modal-label">Note (optional)</label>
+    <textarea class="modal-ta" id="assignNote" placeholder="Add a note…"></textarea>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal(&#39;assignModal&#39;)">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmAssign()">Assign</button>
+    </div>
+  </div>
+</div>
+<div class="modal-wrap" id="priorityModal">
+  <div class="modal">
+    <div class="modal-title">Set Triage Status</div>
+    <div style="display:flex;gap:7px;margin-bottom:14px" id="priBtnGrp"></div>
+    <label class="modal-label">Reason</label>
+    <textarea class="modal-ta" id="priReason" placeholder="Why are you changing triage status?"></textarea>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal(&#39;priorityModal&#39;)">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmPriority()">Set Status</button>
+    </div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="file:///C:/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ═══════════════════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════════════════
+let emails = [
+  { id:1, message_id:"MSG-001", conversation_id:"AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAMVTuwdVxIxNnZ85yyr4AA1=",
+    subject:"Invitation to Share Confidential Financial Statements",
+    sender:"PortalSupport@supplychainmonitor.com",
+    to:["triage@financials","ops@financials"],
+    cc:[],
+    received_date_time:"2026-03-11T13:26:33Z", has_attachments:false, is_read:false,
+    web_link:"https://outlook/.../MSG-001",
+    body_preview:"Philips Risk Central Support has extended an invitation to share confidential financial statements for Mill Rock Packaging Inc. Please verify recipient permissions and confirm upload through the portal.",
+    full_body:"Dear Team,\n\nPhilips Risk Central Support has extended an invitation to share confidential financial statements for Mill Rock Packaging Inc. Please verify recipient permissions and confirm upload through the portal.\n\nBest regards,\nPortal Support",
+    company:"Mill Rock Packaging Inc.",
+    suggested_action:"Verify recipient permissions and confirm upload",
+    assigned_to:"triage@financials", triageStatus:"unread", priority:"Low", tags:["portal"], audit_log:[], last_updated:"2026-03-11T13:26:33Z" },
+
+  { id:2, message_id:"MSG-002", conversation_id:"AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQABp7kQfR2E9Pm3X6cLwtBC8=",
+    subject:"Welcome to the SupplyChainMonitor CFS Solution — Your Comprehensive Guide",
+    sender:"PortalSupport@supplychainmonitor.com",
+    to:["triage@financials","ops@financials","david.holland"],
+    cc:[],
+    received_date_time:"2026-03-11T13:26:32Z", has_attachments:false, is_read:false,
+    web_link:"https://outlook/.../MSG-002",
+    body_preview:"Welcome to SupplyChainMonitor's Confidential Financial Statements Solution. This guide will help you get started with uploading and managing financial data.",
+    full_body:"Welcome to SupplyChainMonitor!\n\nThis comprehensive guide covers everything you need to know about using the Confidential Financial Statements Solution.\n\nPlease review the attached documentation and complete the onboarding steps.",
+    company:"",
+    suggested_action:"Informational — no urgent action required",
+    assigned_to:"", triageStatus:"unread", priority:"Low", tags:["onboarding"], audit_log:[], last_updated:"2026-03-11T13:26:32Z" },
+
+  { id:3, message_id:"MSG-003", conversation_id:"AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAHn2Rc4kT7FBqW9msDx3EK0=",
+    subject:"Your financials are ready to be published — Next Steps",
+    sender:"PortalSupport@supplychainmonitor.com",
+    to:["david.holland"],
+    cc:["triage@financials","ops@financials"],
+    received_date_time:"2026-03-11T13:08:14Z", has_attachments:false, is_read:false,
+    web_link:"https://outlook/.../MSG-003",
+    body_preview:"Your financials are ready to be published. Please review publishing rules and confirm all attachments are correct before proceeding with the upload.",
+    full_body:"Dear Team,\n\nYour financials for ASJ Holdings Ltd are ready to be published. Please review the publishing rules and confirm all attachments are correct before proceeding.\n\nBest regards,\nPortal Support",
+    company:"ASJ Holdings Ltd",
+    suggested_action:"Review publishing rules and confirm attachments",
+    assigned_to:"david.holland", triageStatus:"unread", priority:"Low", tags:["publish"], audit_log:[], last_updated:"2026-03-11T13:08:14Z" },
+
+  { id:4, message_id:"MSG-004", conversation_id:"AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAFUyuwdVxIxNnZ85yyr4BX0=",
+    subject:"Action Required: Issue Processing Your Financial Statement Upload",
+    sender:"kgruenwald@creditriskmonitor.com",
+    to:["richard.narine","ops@financials"],
+    cc:["triage@financials"],
+    received_date_time:"2026-03-11T12:56:32Z", has_attachments:false, is_read:true,
+    web_link:"https://outlook/.../MSG-004",
+    body_preview:"We encountered an issue while processing the PDF upload for ASJ Holdings Ltd. Immediate action required — error on page 3 of ASJ_Holdings_FY2025.pdf.",
+    full_body:"URGENT: We encountered an issue while processing the PDF financial statement upload for ASJ Holdings Ltd.\n\nError Details:\n- File: ASJ_Holdings_FY2025.pdf\n- Error: PDF parsing failed on page 3\n- Timestamp: 2026-03-11T12:55:00Z\n\nPlease investigate and request a re-upload if necessary.",
+    company:"ASJ Holdings Ltd",
+    suggested_action:"Investigate processing error; request re-upload",
+    assigned_to:"richard.narine", triageStatus:"open", priority:"Low", tags:["error","processing"],
+    audit_log:[{timestamp:"2026-03-11T12:57:00Z",user:"system",action:"auto_escalate",note:"Auto-escalated: processing error"}],
+    last_updated:"2026-03-11T12:56:32Z" },
+
+  { id:5, message_id:"MSG-005", conversation_id:"AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAFUyuwdVxIxNnZ85yyr4BX0=",
+    subject:"RE: Confidential Financial Statement Upload for ASJ Holdings Ltd",
+    sender:"dholland@creditriskmonitor.com",
+    to:["ops@financials","richard.narine"],
+    cc:["triage@financials"],
+    received_date_time:"2026-03-11T13:17:09Z", has_attachments:false, is_read:false,
+    web_link:"https://outlook/.../MSG-005",
+    body_preview:"Forwarding thread from Risk.central.support — the portal functional account needs follow-up to confirm receipt and processing status for ASJ Holdings Ltd.",
+    full_body:"David Holland forwarded:\n\nOriginal thread from Risk.central.support regarding the ASJ Holdings Ltd financial statement upload. The portal functional account needs follow-up to confirm receipt and processing status.",
+    company:"ASJ Holdings Ltd",
+    suggested_action:"Follow up with portal functional account",
+    assigned_to:"david.holland", triageStatus:"unread", priority:"Low", tags:["thread"], audit_log:[], last_updated:"2026-03-11T13:17:09Z" },
+
+  { id:6, message_id:"MSG-006", conversation_id:"AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAKdP3Gx8S2NcvE7bRm1qTF4=",
+    subject:"RE: Invitation to Upload Financial Statements",
+    sender:"CGulick@creditriskmonitor.com",
+    to:["triage@financials"],
+    cc:[],
+    received_date_time:"2026-03-11T13:02:36Z", has_attachments:true, is_read:true,
+    web_link:"https://outlook/.../MSG-006",
+    body_preview:"Forwarded from Risk.central.support — please find attached the financial statements PDF for Interpak BTM. Verify content and confirm portal upload.",
+    full_body:"Forwarded from Risk.central.support:\n\nPlease find attached the financial statements PDF for Interpak BTM. Verify the content and confirm upload through the portal.",
+    company:"Interpak BTM",
+    suggested_action:"Review attached PDF, verify content",
+    assigned_to:"triage@financials", triageStatus:"open", priority:"Low", tags:["attachment"], audit_log:[], last_updated:"2026-03-11T13:02:36Z" },
+
+  { id:7, message_id:"MSG-007", conversation_id:"AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAKdP3Gx8S2NcvE7bRm1qTF4=",
+    subject:"RE: RE: Invitation to Upload Financial Statements",
+    sender:"CGulick@creditriskmonitor.com",
+    to:["triage@financials","david.holland"],
+    cc:["ops@financials"],
+    received_date_time:"2026-03-11T12:45:36Z", has_attachments:true, is_read:false,
+    web_link:"https://outlook/.../MSG-007",
+    body_preview:"Thread references Risk.central.support and portal responses for Interpak BTM. Multiple portal responses received — resolve threaded questions and confirm upload status.",
+    full_body:"Continued thread regarding Interpak BTM financial statement upload.\n\nMultiple portal responses have been received. Please resolve the threaded questions and confirm the final upload status.",
+    company:"Interpak BTM",
+    suggested_action:"Resolve threaded questions; confirm upload status",
+    assigned_to:"triage@financials", triageStatus:"unread", priority:"Low", tags:["thread","follow-up"], audit_log:[], last_updated:"2026-03-11T12:45:36Z" },
+
+  { id:8, message_id:"MSG-008", conversation_id:"AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAL9wJm5eU6XDsN4hFc2vYQ3=",
+    subject:"Confidential Financial Statement Upload for ASJ Holdings Ltd",
+    sender:"risk.central.support@philips.onmicrosoft.com",
+    to:["ops@financials"],
+    cc:["triage@financials","richard.narine"],
+    received_date_time:"2026-03-11T11:12:34Z", has_attachments:false, is_read:true,
+    web_link:"https://outlook/.../MSG-008",
+    body_preview:"Notification from portal functional account — confidential financial statement for ASJ Holdings Ltd received. Please confirm portal acknowledgements to complete the intake process.",
+    full_body:"Portal Notification:\n\nA confidential financial statement has been uploaded for ASJ Holdings Ltd through the portal functional account. Please confirm acknowledgement and verify processing status.",
+    company:"ASJ Holdings Ltd",
+    suggested_action:"Confirm portal acknowledgements",
+    assigned_to:"ops@financials", triageStatus:"open", priority:"High", tags:["portal"], audit_log:[], last_updated:"2026-03-11T11:12:34Z" },
+
+  { id:9, message_id:"MSG-009", conversation_id:"AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAZx6KpT1W8MbqD5nRe9sGH2=",
+    subject:"Unified CFS - Business Info Details",
+    sender:"PortalSupport@creditriskmonitor.com",
+    to:["triage@financials"],
+    cc:[],
+    received_date_time:"2026-03-11T16:38:29Z", has_attachments:false, is_read:true,
+    web_link:"https://outlook/.../MSG-009",
+    body_preview:"Business info updated for Clico.pl in the Unified CFS system. Please verify if there is a mismatch with the CRM records — field discrepancy found in address block.",
+    full_body:"Business Info Update:\n\nThe following business information has been updated for Clico.pl in the Unified CFS system. Please verify if there is a mismatch with the CRM records.",
+    company:"Clico.pl",
+    suggested_action:"Verify business info mismatch if CRM differs",
+    assigned_to:"", triageStatus:"open", priority:"Low", tags:["info"], audit_log:[], last_updated:"2026-03-11T16:38:29Z" },
+
+  { id:10, message_id:"MSG-010", conversation_id:"AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQANt4Hv7cB3KeLp8wXj0fCD6=",
+    subject:"System: Upload Confirmation",
+    sender:"PortalSupport@supplychainmonitor.com",
+    to:["ops@financials","triage@financials"],
+    cc:[],
+    received_date_time:"2026-03-10T09:00:00Z", has_attachments:true, is_read:false,
+    web_link:"https://outlook/.../MSG-010",
+    body_preview:"Upload confirmed successfully for Mill Rock Packaging Inc. — your financial statement has been received and processed. No further action is required.",
+    full_body:"Upload Confirmation:\n\nYour financial statement upload for Mill Rock Packaging Inc. has completed successfully. No further action is required unless a follow-up is needed.",
+    company:"Mill Rock Packaging Inc.",
+    suggested_action:"No action unless follow-up needed",
+    assigned_to:"", triageStatus:"resolved", priority:"Low",
+    tags:["confirm"],
+    audit_log:[{timestamp:"2026-03-10T10:00:00Z",user:"system",action:"auto_resolve",note:"Upload confirmed successfully"}],
+    last_updated:"2026-03-10T09:00:00Z" }
+];
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let view            = "inbox";
+let selected        = null;
+let triageFilters   = [];
+let priorityFilters = [];
+let triageTarget    = "";
+let queueSel        = new Set();
+let sortCol         = "date";
+let sortDir         = -1;
+
+// ═══════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════
+const esc   = s => { const d=document.createElement("div"); d.textContent=String(s||""); return d.innerHTML; };
+const role  = () => document.getElementById("roleSelect").value;
+const isDry = () => document.getElementById("dryRun").checked;
+
+function fmtDate(d) {
+  if (!d) return "—";
+  const dt = new Date(d), m = (Date.now()-dt.getTime())/60000;
+  if (m<1) return "Just now";
+  if (m<60) return `${Math.floor(m)}m ago`;
+  if (m<1440) return `${Math.floor(m/60)}h ago`;
+  return dt.toLocaleDateString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+}
+
+function triageStatusOf(email) {
+  return email.triageStatus || "unread";
+}
+
+/* Auto-assign priority from sender.
+   Low  = internal (creditriskmonitor.com) or auto-generated (supplychainmonitor.com portal)
+   High = external counterparty / Philips / any other sender
+   Medium is manual-only — never auto-assigned. */
+function autoPriority(sender) {
+  const s = (sender || "").toLowerCase();
+  if (s.includes("creditriskmonitor.com")) return "Low";
+  if (s === "portalsupport@supplychainmonitor.com") return "Low";
+  return "High";
+}
+
+function pill(ts) {
+  if (ts === 'resolved') return `<span class="pill pill-resolved"><span class="pill-dot"></span>RESOLVED</span>`;
+  if (ts === 'open')     return `<span class="pill pill-open"><span class="pill-dot"></span>OPEN</span>`;
+  return `<span class="pill pill-unread"><span class="pill-dot"></span>UNREAD</span>`;
+}
+function priorityPill(p) {
+  if (!p) return '';
+  const cls = p==='High'?'ph':p==='Medium'?'pm':'pl';
+  return `<span class="pill ${cls}">${esc(p)}</span>`;
+}
+function badge(s) { return `<span class="sbadge s${esc(s)}">${esc(s)}</span>`; }
+function chips(ts) { return (ts||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join(""); }
+function convChip(c) {
+  const short = c.length > 16 ? c.slice(0,8) + '…' + c.slice(-6) : c;
+  return `<span class="conv-chip" title="${esc(c)}">${esc(short)}</span>`;
+}
+
+/* Render recipient chips — show all To (blue) and CC (purple) */
+function rcptChips(toAddrs, ccAddrs) {
+  const to = toAddrs || [];
+  const cc = ccAddrs || [];
+  if (!to.length && !cc.length) return `<span style="color:var(--t3);font-size:11px">—</span>`;
+  let html = `<div class="rcpt-list">`;
+  to.forEach(a => { html += `<span class="rcpt-chip" title="${esc(a)}">${esc(a)}</span>`; });
+  cc.forEach(a => { html += `<span class="cc-chip" title="${esc(a)}">CC: ${esc(a)}</span>`; });
+  html += `</div>`;
+  return html;
+}
+
+function dateResolved(e) {
+  const entry = (e.audit_log||[]).slice().reverse().find(l => l.action && l.action.toLowerCase().includes("resolve"));
+  return entry ? fmtDate(entry.timestamp) : `<span style="color:var(--t3)">—</span>`;
+}
+
+function attachIcon() {
+  return `<svg class="attach-ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>`;
+}
+
+function toast(msg, type="success") {
+  const c=document.getElementById("toasts"), t=document.createElement("div");
+  t.className=`toast t-${type}`; t.textContent=msg; c.appendChild(t);
+  setTimeout(()=>{ t.style.opacity="0"; setTimeout(()=>t.remove(),300); }, 3200);
+}
+
+function updateEmail(msgId, patches, action, note) {
+  emails = emails.map(e => {
+    if (e.message_id!==msgId) return e;
+    return { ...e, ...patches,
+      audit_log:[...(e.audit_log||[]),{timestamp:new Date().toISOString(),user:role(),action,note:note||""}],
+      last_updated:new Date().toISOString() };
+  });
+  if (selected?.message_id===msgId) {
+    selected = emails.find(e=>e.message_id===msgId);
+    renderPanel();
+  }
+  render();
+}
+
+function callWebhook(ep, payload) {
+  toast(`${isDry()?"[DRY RUN] ":""}Webhook → ${ep}`, "info");
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FILTERING / SORTING
+// ═══════════════════════════════════════════════════════════
+const AUTO_EMAIL_SENDER = "portalsupport@supplychainmonitor.com";
+
+function filtered() {
+  const q    = (document.getElementById("searchInput").value||"").toLowerCase();
+  const co   = document.getElementById("fltCompany").value;
+  const as   = document.getElementById("fltAssigned").value;
+  const hide = document.getElementById("hideAutoEmails")?.checked;
+  let data = [...emails];
+  if (hide) data = data.filter(e => e.sender.toLowerCase() !== AUTO_EMAIL_SENDER);
+  if (q) data = data.filter(e =>
+    (e.subject+" "+(e.full_body||e.body_preview||"")+" "+e.company+" "+e.sender+" "+
+     (e.to||[]).join(" ")+" "+(e.cc||[]).join(" ")).toLowerCase().includes(q));
+  if (triageFilters.length)   data = data.filter(e => triageFilters.includes(triageStatusOf(e)));
+  if (priorityFilters.length) data = data.filter(e => priorityFilters.includes(e.priority||"Medium"));
+  if (co) data = data.filter(e=>e.company===co);
+  if (as) data = data.filter(e=>e.assigned_to===as);
+  data.sort((a,b)=>{
+    if (sortCol==="triage")  { const w={unread:0,open:1,resolved:2}; return sortDir*(w[triageStatusOf(a)]-w[triageStatusOf(b)]); }
+    if (sortCol==="sender")  return sortDir*(a.sender.localeCompare(b.sender));
+    if (sortCol==="subject") return sortDir*(a.subject.localeCompare(b.subject));
+    return sortDir*(new Date(b.received_date_time)-new Date(a.received_date_time));
+  });
+  return data;
+}
+
+function toggleTF(ts) {
+  const i = triageFilters.indexOf(ts);
+  if (i>=0) triageFilters.splice(i,1); else triageFilters.push(ts);
+  document.getElementById("pfUnread").className   = "pf-btn" + (triageFilters.includes("unread")    ? " pf-unread"   : "");
+  document.getElementById("pfOpen").className     = "pf-btn" + (triageFilters.includes("open")      ? " pf-open-ts"  : "");
+  document.getElementById("pfResolved").className = "pf-btn" + (triageFilters.includes("resolved")  ? " pf-resolved" : "");
+  render();
+}
+
+function togglePF(p) {
+  const i = priorityFilters.indexOf(p);
+  if (i>=0) priorityFilters.splice(i,1); else priorityFilters.push(p);
+  document.getElementById("pfHigh").className   = "pf-btn" + (priorityFilters.includes("High")   ? " pf-high"   : "");
+  document.getElementById("pfMedium").className = "pf-btn" + (priorityFilters.includes("Medium") ? " pf-medium" : "");
+  document.getElementById("pfLow").className    = "pf-btn" + (priorityFilters.includes("Low")    ? " pf-low"    : "");
+  render();
+}
+
+function populateDropdowns() {
+  const cs=[...new Set(emails.map(e=>e.company).filter(Boolean))];
+  const as=[...new Set(emails.map(e=>e.assigned_to).filter(Boolean))];
+  const cf=document.getElementById("fltCompany"), af=document.getElementById("fltAssigned");
+  const cv=cf.value, av=af.value;
+  cf.innerHTML='<option value="">All Companies</option>'+cs.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  af.innerHTML='<option value="">All Assignees</option>'+as.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join("");
+  cf.value=cv; af.value=av;
+}
+
+function setSort(col) {
+  sortDir = (sortCol===col) ? -sortDir : -1;
+  sortCol = col;
+  render();
+}
+function sa(col) { return sortCol===col?(sortDir===-1?" ↓":" ↑"):""; }
+
+// ═══════════════════════════════════════════════════════════
+//  VIEW ROUTING
+// ═══════════════════════════════════════════════════════════
+function switchView(v) {
+  view = v;
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
+  render();
+}
+
+function render() {
+  populateDropdowns();
+  const data = filtered();
+  document.getElementById("tbarInfo").innerHTML=
+    `${data.length} email${data.length!==1?"s":""} · <kbd>i</kbd> Inbox <kbd>t</kbd> Threads <kbd>k</kbd> Kanban`;
+  const mc = document.getElementById("mainContent");
+  if      (view==="inbox")     renderInbox(mc,data);
+  else if (view==="threads")   renderThreads(mc,data);
+  else if (view==="kanban")    renderKanban(mc,data);
+  else if (view==="queue")     renderQueue(mc);
+  else if (view==="analytics") renderAnalytics(mc);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INBOX VIEW
+// ═══════════════════════════════════════════════════════════
+function renderInbox(mc, data) {
+  const threadMap={};
+  emails.forEach(e=>{ threadMap[e.conversation_id]=(threadMap[e.conversation_id]||0)+1; });
+
+  let html=`<div class="tbl-wrap"><table class="tbl"><thead><tr>
+    ${role()!=="Viewer"?`<th style="width:36px"></th>`:""}
+    <th style="width:28px;text-align:center">#</th>
+    <th style="width:80px">Priority</th>
+    <th style="width:90px">Conversation ID</th>
+    <th class="sortable" onclick="setSort('sender')"  style="min-width:140px">Sender${sa('sender')}</th>
+    <th style="min-width:220px">Recipients (To + CC)</th>
+    <th class="sortable" onclick="setSort('subject')" style="min-width:250px">Subject${sa('subject')}</th>
+    <th style="min-width:100px">Company</th>
+    <th style="min-width:200px">Body</th>
+    <th style="width:26px" title="Attachments">📎</th>
+    <th style="min-width:120px">Assigned</th>
+    <th class="sortable" onclick="setSort('triage')" style="width:100px">Status${sa('triage')}</th>
+    <th class="sortable" onclick="setSort('date')" style="width:110px">Received${sa('date')}</th>
+    <th style="min-width:110px">Date Resolved</th>
+  </tr></thead><tbody>`;
+
+  if (!data.length) {
+    html+=`<tr><td colspan="${role()!=="Viewer"?14:13}" style="text-align:center;padding:40px;color:var(--t3)">No emails match the current filters</td></tr>`;
+  }
+
+  data.forEach(e=>{
+    const tc = threadMap[e.conversation_id]||1;
+    html+=`<tr class="${e.triageStatus==="unread"?"unread":""}${selected?.message_id===e.message_id?" selected":""}"
+               onclick="openDetail('${esc(e.message_id)}')">
+      ${role()!=="Viewer"?`<td style="text-align:center" onclick="event.stopPropagation()">
+        <button title="Delete email" onclick="deleteEmail('${esc(e.message_id)}')"
+          style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;padding:2px 4px;border-radius:3px;line-height:1"
+          onmouseover="this.style.color='var(--red)';this.style.background='var(--red-dim)'"
+          onmouseout="this.style.color='var(--t3)';this.style.background='none'">🗑</button>
+      </td>`:""}
+      <td style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--t3)">${esc(e.message_id)}</td>
+      <td>${priorityPill(e.priority||'Medium')}</td>
+      <td class="col-conv">
+        ${convChip(e.conversation_id)}
+        ${tc>1?`<div style="margin-top:2px"><span class="thread-count" title="${tc} messages">${tc}</span> <span style="font-size:10px;color:var(--t2)">msgs</span></div>`:""}
+      </td>
+      <td class="col-from">
+        <div class="from-main" onclick="toggleSenderExpand(this,event)" title="${esc(e.sender)}">${esc(e.sender)}<span class="from-chevron"> ▼</span></div>
+      </td>
+      <td>${rcptChips(e.to, e.cc)}</td>
+      <td class="subj-cell">
+        <div class="subj-text">
+          ${esc(e.subject)}
+          ${e.has_attachments?`<span style="margin-left:3px">${attachIcon()}</span>`:""}
+        </div>
+      </td>
+      <td style="font-weight:600;font-size:12px;white-space:nowrap">${esc(e.company)||`<span style="color:var(--t3)">—</span>`}</td>
+      <td style="min-width:200px">
+        <div class="body-text">${esc(e.full_body||e.body_preview||"")}</div>
+      </td>
+      <td style="text-align:center">${e.has_attachments?attachIcon():""}</td>
+      <td class="assign-cell" onclick="event.stopPropagation();startEditAssignee('${esc(e.message_id)}',this)">
+        <span>${e.assigned_to ? esc(e.assigned_to) : `<span style="color:var(--t3)">Unassigned</span>`}</span>
+        <span class="assign-edit-ico">✏</span>
+      </td>
+      <td>${pill(triageStatusOf(e))}</td>
+      <td class="col-date">${fmtDate(e.received_date_time)}</td>
+      <td class="col-date">${dateResolved(e)}</td>
+    </tr>`;
+  });
+  html+="</tbody></table></div>";
+  mc.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  THREADS VIEW
+// ═══════════════════════════════════════════════════════════
+function renderThreads(mc, data) {
+  const groups={};
+  data.forEach(e=>{ if(!groups[e.conversation_id])groups[e.conversation_id]=[]; groups[e.conversation_id].push(e); });
+  Object.values(groups).forEach(g=>g.sort((a,b)=>new Date(a.received_date_time)-new Date(b.received_date_time)));
+  const sorted=Object.entries(groups).sort((a,b)=>{
+    const la=Math.max(...a[1].map(e=>new Date(e.received_date_time)));
+    const lb=Math.max(...b[1].map(e=>new Date(e.received_date_time)));
+    return lb-la;
+  });
+
+  let html=`<table class="tbl" style="table-layout:fixed"><thead><tr>
+    <th style="width:24px"></th>
+    <th style="width:120px">Triage Status</th>
+    <th style="min-width:200px">Subject / Body Preview</th>
+    <th style="width:160px">From (Senders)</th>
+    <th style="width:170px">To / CC Recipients</th>
+    <th style="width:82px">Conv ID</th>
+    <th style="width:34px">#</th>
+    <th style="width:90px">Latest</th>
+    <th style="width:84px">Status</th>
+  </tr></thead><tbody>`;
+
+  sorted.forEach(([convId, msgs])=>{
+    const allFrom= [...new Set(msgs.map(e=>e.sender))];
+    const allTo  = [...new Set(msgs.flatMap(e=>(e.to||[])))];
+    const allCC  = [...new Set(msgs.flatMap(e=>(e.cc||[])))];
+    const latest = msgs[msgs.length-1];
+    const unread = msgs.some(e=>triageStatusOf(e)==="unread");
+    const tsOrder = {unread:0,open:1,resolved:2};
+    const convStatus = msgs.reduce((best,e)=>tsOrder[triageStatusOf(e)]<tsOrder[best]?triageStatusOf(e):best, triageStatusOf(msgs[0]));
+
+    html+=`<tr class="thread-group${unread?" tg-unread":""}" onclick="toggleThread('${esc(convId)}')">
+      <td style="text-align:center;padding:0 6px">
+        <svg class="tg-arr" id="arr-${esc(convId)}" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </td>
+      <td>${pill(convStatus)}</td>
+      <td style="overflow:hidden">
+        <div class="tg-subj" title="${esc(latest.subject)}">${esc(latest.subject)}
+          ${msgs.length>1?`<span class="thread-count">${msgs.length}</span>`:""}
+        </div>
+        <div class="tg-body-prev" title="${esc(latest.body_preview)}">${esc(latest.body_preview)}</div>
+      </td>
+      <td><div class="tg-parts" title="${esc(allFrom.join(', '))}">${esc(allFrom.join(", "))}</div></td>
+      <td>${rcptChips(allTo, allCC)}</td>
+      <td>${convChip(convId)}</td>
+      <td style="text-align:center;font-family:var(--mono);font-size:12px;font-weight:700">${msgs.length}</td>
+      <td class="col-date">${fmtDate(latest.received_date_time)}</td>
+      <td>${pill(convStatus)}</td>
+    </tr>
+    <tr id="tm-${esc(convId)}" style="display:none"><td colspan="9" style="padding:0">
+      <div class="thread-msgs" id="tmd-${esc(convId)}">`;
+
+    msgs.forEach((e,i)=>{
+      const toAll=[...(e.to||[]),...(e.cc||[])];
+      html+=`<div class="thread-msg" onclick="event.stopPropagation();openDetail('${esc(e.message_id)}')">
+        <div class="tm-num">${i+1}</div>
+        <div class="tm-body">
+          <div class="tm-row1">
+            <span class="tm-from">${esc(e.sender)}</span>
+            ${toAll.length?`<span class="tm-to">→ ${esc(toAll.slice(0,3).join(", "))}${toAll.length>3?` +${toAll.length-3}`:""}</span>`:""}
+            ${pill(triageStatusOf(e))}
+            ${e.has_attachments?attachIcon():""}
+            <span class="tm-date">${fmtDate(e.received_date_time)}</span>
+          </div>
+          <div class="tm-preview" style="font-weight:600">${esc(e.subject)}</div>
+          <div class="tm-preview" style="color:var(--t2);margin-top:1px">${esc(e.body_preview)}</div>
+        </div>
+      </div>`;
+    });
+    html+=`</div></td></tr>`;
+  });
+
+  html+="</tbody></table>";
+  mc.innerHTML=html;
+}
+
+function toggleThread(convId) {
+  const row=document.getElementById(`tm-${convId}`);
+  const arr=document.getElementById(`arr-${convId}`);
+  const div=document.getElementById(`tmd-${convId}`);
+  if (!row) return;
+  const open=row.style.display!=="none";
+  row.style.display=open?"none":"";
+  div?.classList.toggle("open",!open);
+  arr?.classList.toggle("open",!open);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  KANBAN VIEW
+// ═══════════════════════════════════════════════════════════
+function renderKanban(mc, data) {
+  const groups={ unread:[], open:[], resolved:[] };
+  data.forEach(e=>{ const ts=triageStatusOf(e); if(groups[ts])groups[ts].push(e); });
+  const priOrder={High:0,Medium:1,Low:2};
+  Object.values(groups).forEach(g=>g.sort((a,b)=>(priOrder[a.priority||"Medium"]??1)-(priOrder[b.priority||"Medium"]??1)));
+
+  let html='<div class="kanban-wrap">';
+  ["unread","open","resolved"].forEach(ts=>{
+    const cssKey = ts;
+    html+=`<div class="k-col k-${cssKey}" id="kc-${ts}"
+                ondragover="event.preventDefault();this.classList.add('drop-over')"
+                ondragleave="this.classList.remove('drop-over')"
+                ondrop="kanbanDrop(event,'${ts}');this.classList.remove('drop-over')">
+      <div class="k-head">${pill(ts)} <span class="k-cnt">${groups[ts].length}</span></div>`;
+    if (!groups[ts].length) html+='<div class="k-empty">No items</div>';
+    groups[ts].forEach(e=>{
+      const toStr=(e.to||[]).slice(0,2).join(", ")+(e.to?.length>2?` +${e.to.length-2}`:"");
+      html+=`<div class="k-card" draggable="true"
+                  ondragstart="event.dataTransfer.setData('text','${esc(e.message_id)}');this.classList.add('dragging')"
+                  ondragend="this.classList.remove('dragging')"
+                  onclick="openDetail('${esc(e.message_id)}')">
+        <div class="k-card-title">${esc(e.subject)}</div>
+        <div class="k-card-body" title="${esc(e.body_preview)}">${esc(e.body_preview)}</div>
+        <div class="k-card-from" title="${esc(e.sender)}">↑ ${esc(e.sender)}</div>
+        ${toStr?`<div class="k-card-to" title="${esc((e.to||[]).join(', '))}">↓ ${esc(toStr)}</div>`:""}
+        <div class="k-card-meta">
+          ${priorityPill(e.priority||'Medium')}
+          ${convChip(e.conversation_id)}
+          <span style="font-size:11px;font-weight:600">${esc(e.company||"—")}</span>
+          <span style="font-size:10px;color:var(--t2)">${fmtDate(e.received_date_time)}</span>
+          ${e.has_attachments?attachIcon():""}
+        </div>
+        <div class="k-card-foot">
+          <span style="font-size:11px;color:var(--t2)">${esc(e.assigned_to||"Unassigned")}</span>
+        </div>
+      </div>`;
+    });
+    html+="</div>";
+  });
+  html+="</div>";
+  mc.innerHTML=html;
+}
+
+function kanbanDrop(event, newTriageStatus) {
+  event.preventDefault();
+  const msgId=event.dataTransfer.getData("text");
+  if (role()==="Viewer") { toast("Viewers cannot change status","error"); return; }
+  updateEmail(msgId, {triageStatus:newTriageStatus}, "kanban_drag", `Moved to ${newTriageStatus}`);
+  if (document.getElementById("syncOutlook").checked) callWebhook("move",{message_id:msgId,target_triage:newTriageStatus});
+  const label = newTriageStatus==="resolved"?"Resolved":newTriageStatus==="open"?"Open":"Unread";
+  toast(`Status → ${label}`);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  WORK QUEUE VIEW
+// ═══════════════════════════════════════════════════════════
+function renderQueue(mc) {
+  const q=emails.filter(e=>triageStatusOf(e)==="unread"||triageStatusOf(e)==="open")
+               .sort((a,b)=>new Date(a.received_date_time)-new Date(b.received_date_time));
+  const unreadCnt   = emails.filter(e=>triageStatusOf(e)==="unread").length;
+  const openCnt     = emails.filter(e=>triageStatusOf(e)==="open").length;
+  const resolvedCnt = emails.filter(e=>triageStatusOf(e)==="resolved").length;
+  queueSel=new Set();
+
+  let html=`<div class="q-stats">
+    <div class="q-stat" style="border-top-color:#334155"><div class="q-stat-val" style="color:#334155">${unreadCnt}</div><div class="q-stat-label">Unread</div></div>
+    <div class="q-stat" style="border-top-color:var(--amber)"><div class="q-stat-val" style="color:var(--amber)">${openCnt}</div><div class="q-stat-label">Open</div></div>
+    <div class="q-stat" style="border-top-color:var(--green)"><div class="q-stat-val" style="color:var(--green)">${resolvedCnt}</div><div class="q-stat-label">Resolved</div></div>
+    <div class="q-bulk" id="bulkActions"></div>
+  </div>
+  <div class="panel-wrap"><table class="tbl"><thead><tr>
+    <th><input type="checkbox" class="chk" id="qAll" onclick="qSelectAll(${q.length})"></th>
+    <th style="min-width:200px">Subject / Body Preview</th>
+    <th style="min-width:140px">From</th>
+    <th style="min-width:150px">To + CC</th>
+    <th style="width:80px">Conv ID</th>
+    <th style="min-width:110px">Company</th>
+    <th style="width:110px">Received</th>
+    <th style="min-width:100px">Assigned</th>
+    <th style="width:90px">Status</th>
+    <th style="min-width:160px">Suggested Action</th>
+  </tr></thead><tbody>`;
+
+  q.forEach(e=>{
+    html+=`<tr onclick="openDetail('${esc(e.message_id)}')">
+      <td onclick="event.stopPropagation()"><input type="checkbox" class="chk q-cb" data-id="${esc(e.message_id)}" onchange="updateQSel()"></td>
+      <td class="subj-cell" style="max-width:none">
+        <div class="subj-text">${esc(e.subject)}</div>
+        <div class="body-text" style="max-height:60px">${esc(e.body_preview)}</div>
+      </td>
+      <td class="col-from"><div class="from-main" title="${esc(e.sender)}">${esc(e.sender)}</div></td>
+      <td>${rcptChips(e.to, e.cc)}</td>
+      <td class="col-conv">${convChip(e.conversation_id)}</td>
+      <td style="font-weight:600;font-size:12px">${esc(e.company||"—")}</td>
+      <td class="col-date">${fmtDate(e.received_date_time)}</td>
+      <td class="assign-cell" onclick="event.stopPropagation();startEditAssignee('${esc(e.message_id)}',this)">
+        <span>${e.assigned_to ? esc(e.assigned_to) : `<span style="color:var(--t3)">—</span>`}</span>
+        <span class="assign-edit-ico">✏</span>
+      </td>
+      <td>${pill(triageStatusOf(e))}</td>
+      <td style="font-size:11px;color:var(--t1)">${esc(e.suggested_action)}</td>
+    </tr>`;
+  });
+  html+="</tbody></table></div>";
+  mc.innerHTML=html;
+}
+
+function qSelectAll(n) {
+  const c=document.getElementById("qAll").checked;
+  document.querySelectorAll(".q-cb").forEach(x=>x.checked=c);
+  updateQSel();
+}
+function updateQSel() {
+  queueSel=new Set();
+  document.querySelectorAll(".q-cb:checked").forEach(c=>queueSel.add(c.dataset.id));
+  const ba=document.getElementById("bulkActions");
+  if(!ba) return;
+  ba.innerHTML=queueSel.size&&role()!=="Viewer"?
+    `<button class="btn btn-success btn-sm" onclick="bulkAction('resolve')">Resolve (${queueSel.size})</button>
+     <button class="btn btn-primary btn-sm" onclick="bulkAction('notify')">Notify (${queueSel.size})</button>`:"";
+}
+function bulkAction(a) {
+  if (role()==="Viewer") { toast("Viewers cannot perform bulk actions","error"); return; }
+  queueSel.forEach(id=>{
+    if(a==="resolve") updateEmail(id,{status:"Resolved"},"bulk_resolve");
+    if(a==="notify")  callWebhook("notify",{message_id:id});
+  });
+  toast(`Bulk ${a}: ${queueSel.size} items`);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ANALYTICS VIEW
+// ═══════════════════════════════════════════════════════════
+function renderAnalytics(mc) {
+  const now=Date.now();
+  const unreadCnt   = emails.filter(e=>triageStatusOf(e)==="unread").length;
+  const openCnt     = emails.filter(e=>triageStatusOf(e)==="open").length;
+  const resolvedCnt = emails.filter(e=>triageStatusOf(e)==="resolved").length;
+  const new24       = emails.filter(e=>triageStatusOf(e)==="unread"&&(now-new Date(e.received_date_time))<86400000).length;
+  const aging       = emails.filter(e=>triageStatusOf(e)==="unread"&&(now-new Date(e.received_date_time))>86400000).length;
+  const convCount   = new Set(emails.map(e=>e.conversation_id)).size;
+
+  const days={};
+  for(let i=29;i>=0;i--){const d=new Date(now-i*86400000).toISOString().split("T")[0];days[d]=0;}
+  emails.filter(e=>triageStatusOf(e)==="unread").forEach(e=>{const k=new Date(e.received_date_time).toISOString().split("T")[0];if(days[k]!==undefined)days[k]++;});
+  const maxC=Math.max(1,...Object.values(days));
+
+  let html=`<div class="an-grid">
+    <div class="an-kpi" style="border-top-color:#334155">
+      <div class="an-val" style="color:#334155">${unreadCnt}</div><div class="an-label">Unread</div></div>
+    <div class="an-kpi" style="border-top-color:var(--amber)">
+      <div class="an-val" style="color:var(--amber)">${openCnt}</div><div class="an-label">Open</div></div>
+    <div class="an-kpi" style="border-top-color:var(--green)">
+      <div class="an-val" style="color:var(--green)">${resolvedCnt}</div><div class="an-label">Resolved</div></div>
+    <div class="an-kpi" style="border-top-color:var(--blue)">
+      <div class="an-val" style="color:var(--blue)">${new24}</div><div class="an-label">New Unread (24h)</div></div>
+    <div class="an-kpi" style="border-top-color:var(--red)">
+      <div class="an-val" style="color:var(--red)">${aging}</div><div class="an-label">Aging Unread &gt;24h</div></div>
+    <div class="an-kpi" style="border-top-color:var(--t2)">
+      <div class="an-val" style="color:var(--t1)">${convCount}</div><div class="an-label">Conversations</div></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Unread Emails — Last 30 Days</div>
+    <div class="chart-bars">`;
+  Object.entries(days).forEach(([date,count])=>{
+    const h=(count/maxC)*85;
+    html+=`<div class="chart-bar" style="height:${Math.max(h,2)}px;background:${count>0?"#334155":"var(--b0)"}" title="${date}: ${count}"></div>`;
+  });
+  html+=`</div><div class="chart-labels"><span>${Object.keys(days)[0]}</span><span>Today</span></div></div>`;
+  mc.innerHTML=html;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DETAIL SIDE PANEL
+// ═══════════════════════════════════════════════════════════
+function openDetail(msgId) {
+  selected=emails.find(e=>e.message_id===msgId);
+  if(!selected) return;
+  if(selected.triageStatus==="unread"){
+    emails=emails.map(e=>e.message_id===msgId?{...e,is_read:true,triageStatus:"open"}:e);
+    selected={...selected,is_read:true,triageStatus:"open"};
+  }
+  renderPanel();
+  document.getElementById("overlay").classList.add("on");
+  document.getElementById("sidePanel").classList.add("open");
+}
+
+function closePanel() {
+  document.getElementById("overlay").classList.remove("on");
+  document.getElementById("sidePanel").classList.remove("open");
+  selected=null; render();
+}
+
+function renderPanel() {
+  const e=selected; if(!e) return;
+  const r=role();
+  const audits=(e.audit_log||[]).slice(-8).reverse();
+  const convMsgs=emails.filter(m=>m.conversation_id===e.conversation_id)
+                       .sort((a,b)=>new Date(a.received_date_time)-new Date(b.received_date_time));
+  const toStr=(e.to||[]).join(", ");
+  const ccStr=(e.cc||[]).join(", ");
+  const toAll=[...(e.to||[]),...(e.cc||[])];
+
+  const panelEl=document.getElementById("sidePanel");
+  panelEl.innerHTML=`
+    <div class="sp-stripe"></div>
+    <div class="sp-head">
+      <div style="flex:1;min-width:0">
+        <div class="sp-subject">${esc(e.subject)}</div>
+        <div class="sp-meta-row">
+          ${pill(triageStatusOf(e))}
+          ${convChip(e.conversation_id)}
+          ${e.has_attachments?`<span style="color:var(--amber);font-size:12px">📎 Attachment</span>`:""}
+        </div>
+      </div>
+      <button class="sp-close" onclick="closePanel()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="sp-body">
+
+      <div class="meta-grid">
+        <span class="meta-k">Priority</span>
+        <span class="meta-v" style="display:flex;align-items:center;gap:7px">
+          ${priorityPill(e.priority||autoPriority(e.sender))}
+          <select class="pri-sel" onclick="event.stopPropagation()"
+            onchange="setPriority('${esc(e.message_id)}',this.value)">
+            <option value="High"  ${(e.priority||autoPriority(e.sender))==='High'  ?'selected':''}>High</option>
+            <option value="Medium"${(e.priority||autoPriority(e.sender))==='Medium'?'selected':''}>Medium</option>
+            <option value="Low"   ${(e.priority||autoPriority(e.sender))==='Low'   ?'selected':''}>Low</option>
+          </select>
+        </span>
+
+        <span class="meta-k">Status</span>
+        <span class="meta-v">${pill(triageStatusOf(e))}</span>
+
+        <span class="meta-k">From</span>
+        <span class="meta-v">${esc(e.sender)}</span>
+
+        <span class="meta-k">To</span>
+        <span class="meta-v">
+          ${(e.to||[]).length ? (e.to||[]).map(a=>`<span style="display:inline-block;margin:1px 4px 1px 0;padding:1px 6px;border-radius:3px;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(26,79,156,.2);font-size:11px">${esc(a)}</span>`).join("") : '<span style="color:var(--t3)">—</span>'}
+        </span>
+
+        ${(e.cc||[]).length?`
+        <span class="meta-k">CC</span>
+        <span class="meta-v">
+          ${(e.cc||[]).map(a=>`<span style="display:inline-block;margin:1px 4px 1px 0;padding:1px 6px;border-radius:3px;background:var(--elevated);color:var(--t1);border:1px solid var(--b0);font-size:11px">${esc(a)}</span>`).join("")}
+        </span>`:""}
+
+        <span class="meta-k">Received</span>
+        <span class="meta-v">${new Date(e.received_date_time).toLocaleString()}</span>
+
+        <span class="meta-k">Company</span>
+        <span class="meta-v" style="font-weight:700">${esc(e.company||"—")}</span>
+
+        <span class="meta-k">Conv ID</span>
+        <span class="meta-v">${convChip(e.conversation_id)}</span>
+
+        <span class="meta-k">Assigned</span>
+        <span class="meta-v assign-cell" style="cursor:pointer" onclick="startEditPanelAssignee('${esc(e.message_id)}',this)">
+          <span>${e.assigned_to ? esc(e.assigned_to) : `<span style="color:var(--t3)">Unassigned</span>`}</span>
+          <span class="assign-edit-ico">✏</span>
+        </span>
+
+        <span class="meta-k">Outlook</span>
+        <span class="meta-v"><a href="${esc(e.web_link)}" target="_blank">Open in Outlook ↗</a></span>
+      </div>
+
+      <div class="callout">
+        <div class="callout-label">Suggested Action</div>
+        <div class="callout-text">${esc(e.suggested_action)}</div>
+      </div>
+
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px">${chips(e.tags)}</div>
+
+      <div class="sp-sec-title">Email Body</div>
+      <div class="email-body">${esc(e.full_body||e.body_preview)}</div>
+
+      <div class="sp-actions">
+        ${r!=="Viewer"?`<button class="btn btn-amber btn-sm"    onclick="openPriModal()">Set Status</button>`:""}
+        ${r!=="Viewer"?`<button class="btn btn-ghost btn-sm"    onclick="doMoveTag()">Move/Tag</button>`:""}
+        ${r!=="Viewer"&&triageStatusOf(e)!=="resolved"?`<button class="btn btn-success btn-sm" onclick="doResolve()">Resolve</button>`:""}
+        <button class="btn btn-ghost btn-sm" onclick="doRerun()">Re-classify</button>
+        ${r!=="Viewer"?`<button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid rgba(192,0,0,.2)" onclick="deleteEmail('${esc(e.message_id)}')">Delete</button>`:""}
+      </div>
+
+      ${convMsgs.length>1?`
+      <div class="sp-sec-title">Thread — ${convMsgs.length} messages in ${esc(e.conversation_id)}</div>
+      ${convMsgs.map((m,i)=>{
+        const mTo=[...(m.to||[]),...(m.cc||[])];
+        const isActive=m.message_id===e.message_id;
+        return `<div class="thread-item${isActive?" active":""}" onclick="openDetail('${esc(m.message_id)}')">
+          <div class="thread-item-head">
+            <span class="thread-from">${i+1}. ${esc(m.sender)}</span>
+            ${pill(triageStatusOf(m))}
+            <span class="thread-time">${fmtDate(m.received_date_time)}</span>
+          </div>
+          <div class="thread-preview">${esc(m.subject)}</div>
+          <div class="thread-preview" style="color:var(--t3);margin-top:1px">${esc(m.body_preview)}</div>
+          <div class="thread-rcpt">↓ ${esc(mTo.slice(0,3).join(", "))+(mTo.length>3?` +${mTo.length-3}` : "")}</div>
+        </div>`;
+      }).join("")}`:""}
+
+      <div class="sp-sec-title">Audit Log</div>
+      ${!audits.length?`<div style="font-size:11px;color:var(--t3)">No events yet</div>`:""}
+      ${audits.map(a=>`
+        <div class="audit-entry">
+          <div class="audit-head">
+            <span class="audit-act">${esc(a.action)}</span>
+            <span class="audit-time">${new Date(a.timestamp).toLocaleString()}</span>
+          </div>
+          <div class="audit-detail">by ${esc(a.user)}${a.note?" — "+esc(a.note):""}</div>
+        </div>`).join("")}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  ACTIONS
+// ═══════════════════════════════════════════════════════════
+function openAssignModal() {
+  if(!selected) return;
+  document.getElementById("assignSel").value=selected.assigned_to||"";
+  document.getElementById("assignNote").value="";
+  document.getElementById("assignModal").classList.add("on");
+}
+function confirmAssign() {
+  if(!selected) return;
+  const target=document.getElementById("assignSel").value;
+  const note=document.getElementById("assignNote").value;
+  updateEmail(selected.message_id,{assigned_to:target},"assign",note);
+  toast(`Assigned to ${target||"(unassigned)"}`);
+  closeModal("assignModal");
+}
+
+function openPriModal() {
+  if(!selected) return;
+  triageTarget=triageStatusOf(selected);
+  document.getElementById("priReason").value="";
+  renderPriBtns();
+  document.getElementById("priorityModal").classList.add("on");
+}
+function renderPriBtns() {
+  document.getElementById("priBtnGrp").innerHTML=[
+    {v:"unread",  label:"Unread",   cls:"btn",          style:"background:#334155;color:#fff;border-color:#334155"},
+    {v:"open",    label:"Open",     cls:"btn btn-amber", style:""},
+    {v:"resolved",label:"Resolved", cls:"btn btn-success",style:""}
+  ].map(({v,label,cls,style})=>{
+    const a=triageTarget===v;
+    const activeStyle=a&&style?`style="${style}"`:a?"":"";
+    return `<button class="${a?cls:"btn btn-ghost"}" ${activeStyle} style="${a&&style?style:""}flex:1;justify-content:center" onclick="triageTarget='${v}';renderPriBtns()">${label}</button>`;
+  }).join("");
+}
+function confirmPriority() {
+  if(!selected) return;
+  const reason=document.getElementById("priReason").value;
+  updateEmail(selected.message_id,{triageStatus:triageTarget},"set_status",`Set to ${triageTarget}${reason?" — "+reason:""}`);
+  if(document.getElementById("syncOutlook").checked) callWebhook("move",{message_id:selected.message_id,target_triage:triageTarget});
+  const label = triageTarget==="resolved"?"Resolved":triageTarget==="open"?"Open":"Unread";
+  toast(`Status → ${label}`);
+  closeModal("priorityModal");
+}
+
+function doMoveTag() {
+  if(!selected) return;
+  callWebhook("move",{message_id:selected.message_id,target_triage:triageStatusOf(selected)});
+  updateEmail(selected.message_id,{},"outlook_move_tag",`${isDry()?"[DRY RUN] ":""}Moved/tagged`);
+  toast(`${isDry()?"[DRY RUN] ":""}Outlook action sent`);
+}
+function doEscalate() {
+  if(!selected) return;
+  updateEmail(selected.message_id,{status:"Escalated",assigned_to:"richard.narine"},"escalate","Escalated by manager");
+  callWebhook("notify",{message_id:selected.message_id,subject:selected.subject});
+  toast("Escalated → richard.narine");
+}
+function doResolve() {
+  if(!selected) return;
+  updateEmail(selected.message_id,{triageStatus:"resolved",status:"Resolved"},"resolve");
+  toast("Marked as Resolved");
+}
+function deleteEmail(msgId) {
+  if(!confirm("Delete this email from the dashboard? This cannot be undone.")) return;
+  emails = emails.filter(e => e.message_id !== msgId);
+  if (selected?.message_id === msgId) {
+    selected = null;
+    document.getElementById("overlay").classList.remove("on");
+    document.getElementById("sidePanel").classList.remove("open");
+  }
+  toast("Email deleted");
+  render();
+}
+
+function doRerun() {
+  if(!selected) return;
+  const ts = triageStatusOf(selected);
+  const action = ts==="unread"?"Review and respond — not yet read":ts==="open"?"Being worked on — awaiting response":"Resolved — no further action needed";
+  updateEmail(selected.message_id,{suggested_action:action},"rerun_classification",`Status: ${ts}`);
+  const label = ts==="resolved"?"Resolved":ts==="open"?"Open":"Unread";
+  toast(`Re-classified: ${label}`);
+}
+function setPriority(msgId, val) {
+  updateEmail(msgId, {priority: val}, 'set_priority', `Priority → ${val}`);
+  toast(`Priority → ${val}`);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  EDITABLE ASSIGNEE
+// ═══════════════════════════════════════════════════════════
+function startEditAssignee(msgId, cell) {
+  const email = emails.find(e=>e.message_id===msgId);
+  if (!email) return;
+  const prev = email.assigned_to || '';
+  cell.innerHTML = `<input class="assign-inp" type="text" value="${esc(prev)}"
+    onclick="event.stopPropagation()"
+    onkeydown="handleAssignKey(event,'${esc(msgId)}',this)"
+    onblur="saveAssignee('${esc(msgId)}',this.value)">`;
+  cell.querySelector('.assign-inp').select();
+}
+function startEditPanelAssignee(msgId, cell) {
+  const email = emails.find(e=>e.message_id===msgId);
+  if (!email) return;
+  const prev = email.assigned_to || '';
+  cell.innerHTML = `<input class="assign-inp" type="text" value="${esc(prev)}"
+    onkeydown="handleAssignKey(event,'${esc(msgId)}',this)"
+    onblur="saveAssignee('${esc(msgId)}',this.value)">`;
+  cell.querySelector('.assign-inp').select();
+}
+function handleAssignKey(ev, msgId, inp) {
+  if (ev.key==='Enter')  { ev.preventDefault(); inp.blur(); }
+  if (ev.key==='Escape') { ev.preventDefault(); const e=emails.find(x=>x.message_id===msgId); if(e){inp.value=e.assigned_to||'';} inp.blur(); }
+}
+function saveAssignee(msgId, val) {
+  const trimmed = val.trim();
+  const email = emails.find(e=>e.message_id===msgId);
+  if (!email || email.assigned_to===trimmed) { render(); if(selected?.message_id===msgId) renderPanel(); return; }
+  updateEmail(msgId, {assigned_to:trimmed}, 'assign', `Assigned to: ${trimmed||"(unassigned)"}`);
+}
+
+function toggleSenderExpand(el, ev) {
+  ev.stopPropagation();
+  el.classList.toggle('expanded');
+  const chev = el.querySelector('.from-chevron');
+  if (chev) chev.textContent = el.classList.contains('expanded') ? ' ▲' : ' ▼';
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove("on"); }
+
+// ═══════════════════════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════════════════════
+document.addEventListener("keydown", ev=>{
+  if(["INPUT","TEXTAREA","SELECT"].includes(ev.target.tagName)) return;
+  if(ev.key==="i"){ ev.preventDefault(); switchView("inbox"); }
+  if(ev.key==="t"){ ev.preventDefault(); switchView("threads"); }
+  if(ev.key==="k"){ ev.preventDefault(); switchView("kanban"); }
+  if(ev.key==="q"){ ev.preventDefault(); switchView("queue"); }
+  if(ev.key==="Escape"){ closePanel(); closeModal("assignModal"); closeModal("priorityModal"); }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  WEBHOOK PANEL
+// ═══════════════════════════════════════════════════════════
+function openWebhookPanel() {
+  document.getElementById("webhookPanel").classList.add("on");
+}
+
+function copyWhUrl() {
+  const url = document.getElementById("whUrlBox").textContent.trim();
+  if (url === "—" || url.startsWith("Host")) { toast("No webhook URL yet — serve over HTTPS or localhost","error"); return; }
+  navigator.clipboard.writeText(url).then(()=>toast("Webhook URL copied!","success"));
+}
+
+function copyCode(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.textContent).then(()=>toast("Copied!","success"));
+}
+
+function addTestEmail() {
+  const sender  = document.getElementById("tSender").value.trim();
+  const subject = document.getElementById("tSubject").value.trim();
+  if (!sender || !subject) { toast("Sender and Subject are required","error"); return; }
+
+  const toVal      = document.getElementById("tTo").value.trim();
+  const ccVal      = document.getElementById("tCc").value.trim();
+  const body       = document.getElementById("tBody").value.trim();
+  const company    = document.getElementById("tCompany").value.trim();
+  const convId     = document.getElementById("tConvId").value.trim() || `CONV-${Date.now()}`;
+  const triageStatus = document.getElementById("tTriageStatus").value || "unread";
+  const priority   = document.getElementById("tPriority").value || autoPriority(sender);
+
+  injectEmails([{
+    message_id:      `MSG-${Date.now()}`,
+    conversation_id: convId,
+    subject,
+    sender,
+    to:   toVal  ? toVal.split(",").map(s=>s.trim()).filter(Boolean) : [],
+    cc:   ccVal  ? ccVal.split(",").map(s=>s.trim()).filter(Boolean) : [],
+    body_preview:  body.slice(0,200),
+    full_body:     body,
+    company,
+    suggested_action: "Review and process",
+    assigned_to:"", triageStatus, priority, tags:[], audit_log:[],
+    received_date_time: new Date().toISOString(),
+    has_attachments: false, is_read: false,
+    web_link:"#", last_updated: new Date().toISOString()
+  }]);
+
+  // Reset form
+  ["tSender","tSubject","tTo","tCc","tBody","tCompany","tConvId"].forEach(id=>document.getElementById(id).value="");
+  closeModal("webhookPanel");
+}
+
+function addSampleEmails() {
+  const now = new Date();
+  const ts  = (minAgo) => new Date(now-minAgo*60000).toISOString();
+  injectEmails([
+    { message_id:`MSG-S1`, conversation_id:"CONV-S1", subject:"URGENT: PDF Processing Failure — ASJ Holdings", sender:"kgruenwald@creditriskmonitor.com", to:["richard.narine","ops@financials"], cc:["triage@financials"], body_preview:"Critical error encountered while processing ASJ_Holdings_FY2026.pdf — parsing failed on page 4. Immediate re-upload required.", full_body:"Critical error encountered while processing ASJ_Holdings_FY2026.pdf — parsing failed on page 4. Immediate re-upload required.", company:"ASJ Holdings Ltd", suggested_action:"Request re-upload immediately", assigned_to:"richard.narine", triageStatus:"unread", tags:["error"], audit_log:[], received_date_time:ts(3), has_attachments:false, is_read:false, web_link:"#", last_updated:ts(3) },
+    { message_id:`MSG-S2`, conversation_id:"CONV-S1", subject:"RE: URGENT: PDF Processing Failure — ASJ Holdings", sender:"richard.narine@creditriskmonitor.com", to:["kgruenwald@creditriskmonitor.com"], cc:["ops@financials"], body_preview:"Acknowledged — I have contacted ASJ Holdings directly and requested a re-upload. Awaiting response.", full_body:"Acknowledged — I have contacted ASJ Holdings directly and requested a re-upload. Awaiting response.", company:"ASJ Holdings Ltd", suggested_action:"Await re-upload confirmation", assigned_to:"richard.narine", triageStatus:"open", tags:["error","follow-up"], audit_log:[], received_date_time:ts(1), has_attachments:false, is_read:false, web_link:"#", last_updated:ts(1) },
+    { message_id:`MSG-S3`, conversation_id:"CONV-S2", subject:"Invitation to Share Financial Statements — Clico.pl", sender:"PortalSupport@supplychainmonitor.com", to:["triage@financials"], cc:[], body_preview:"Philips Risk Central has extended an invitation for Clico.pl to share confidential financial statements through the portal.", full_body:"Philips Risk Central has extended an invitation for Clico.pl to share confidential financial statements through the portal.", company:"Clico.pl", suggested_action:"Verify permissions and confirm upload", assigned_to:"triage@financials", triageStatus:"unread", tags:["portal"], audit_log:[], received_date_time:ts(30), has_attachments:false, is_read:false, web_link:"#", last_updated:ts(30) },
+    { message_id:`MSG-S4`, conversation_id:"CONV-S3", subject:"RE: Upload Confirmation — Mill Rock Packaging", sender:"PortalSupport@supplychainmonitor.com", to:["ops@financials","triage@financials"], cc:[], body_preview:"Upload completed successfully for Mill Rock Packaging Inc. FY2026 statements. No further action required.", full_body:"Upload completed successfully for Mill Rock Packaging Inc. FY2026 statements. No further action required.", company:"Mill Rock Packaging Inc.", suggested_action:"No action required", assigned_to:"", triageStatus:"resolved", tags:["confirm"], audit_log:[], received_date_time:ts(120), has_attachments:true, is_read:true, web_link:"#", last_updated:ts(120) },
+    { message_id:`MSG-S5`, conversation_id:"CONV-S4", subject:"Action Required: Interpak BTM Statement Review", sender:"CGulick@creditriskmonitor.com", to:["david.holland","triage@financials"], cc:["ops@financials"], body_preview:"Attached PDF for Interpak BTM requires review. Multiple discrepancies found in the balance sheet — please verify before publishing.", full_body:"Attached PDF for Interpak BTM requires review. Multiple discrepancies found in the balance sheet — please verify before publishing.", company:"Interpak BTM", suggested_action:"Review PDF for balance sheet discrepancies", assigned_to:"david.holland", triageStatus:"unread", tags:["attachment","review"], audit_log:[], received_date_time:ts(10), has_attachments:true, is_read:false, web_link:"#", last_updated:ts(10) },
+    { message_id:`MSG-S6`, conversation_id:"CONV-S5", subject:"System: New Portal User Registration", sender:"PortalSupport@creditriskmonitor.com", to:["triage@financials"], cc:[], body_preview:"A new portal user has registered: contact@newtenant.com. Please review and approve access within 48 hours per onboarding policy.", full_body:"A new portal user has registered: contact@newtenant.com. Please review and approve access within 48 hours per onboarding policy.", company:"", suggested_action:"Review and approve new user access", assigned_to:"", triageStatus:"unread", tags:["onboarding"], audit_log:[], received_date_time:ts(200), has_attachments:false, is_read:false, web_link:"#", last_updated:ts(200) }
+  ]);
+  closeModal("webhookPanel");
+}
+
+function injectEmails(newEmails) {
+  newEmails.forEach(e => {
+    const idx = emails.findIndex(x=>x.message_id===e.message_id);
+    if (idx>=0) emails[idx]=e; else emails.unshift(e);
+  });
+  render();
+  toast(`${newEmails.length} email${newEmails.length>1?"s":""} added`, "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SERVICE WORKER REGISTRATION
+// ═══════════════════════════════════════════════════════════
+async function registerSW() {
+  const dot   = document.getElementById("swDot");
+  const dot2  = document.getElementById("swStatusDot");
+  const label = document.getElementById("swStatusLabel");
+
+  const setStatus = (color, pulse, text) => {
+    [dot, dot2].forEach(d=>{ if(d){ d.style.background=color; d.style.animation=pulse?"pulse 2s infinite":"none"; }});
+    if(label) label.textContent = text;
+  };
+
+  if (!("serviceWorker" in navigator)) {
+    setStatus("var(--amber)", false, "Service Worker not supported in this browser");
+    return;
+  }
+
+  try {
+    await navigator.serviceWorker.register("./sw.js", { scope: "./" });
+    const webhookUrl = location.href.replace(/\/[^/]*$/, "") + "/webhook";
+    document.getElementById("whUrlBox").textContent = webhookUrl;
+
+    // Patch the n8n snippet with real URL
+    const snip = document.getElementById("n8nSnippet");
+    if (snip) snip.textContent = snip.textContent;  // already static, URL shown above
+
+    setStatus("var(--green)", true, "Service Worker active — webhook ready at URL above");
+  } catch(err) {
+    setStatus("var(--amber)", false, "SW registration failed (needs HTTPS or localhost): " + err.message);
+  }
+
+  // Listen for emails pushed from the SW via BroadcastChannel
+  const bc = new BroadcastChannel("email-dashboard-channel");
+  bc.addEventListener("message", evt => {
+    if (evt.data?.type === "NEW_EMAILS") {
+      injectEmails(evt.data.emails.map(e => ({
+        message_id:      e.id || `MSG-${Date.now()}`,
+        conversation_id: e.conversation_id || e.threadId || e.ConversationId || `CONV-${Date.now()}`,
+        subject:         e.subject || "(No Subject)",
+        sender:          e.sender || e.from || "Unknown",
+        to:   Array.isArray(e.to)  ? e.to  : (e.to  ? [e.to]  : []),
+        cc:   Array.isArray(e.cc)  ? e.cc  : (e.cc  ? [e.cc]  : []),
+        body_preview:    (e.body || e.body_preview || "").slice(0, 200),
+        full_body:       e.body || e.full_body || "",
+        triageStatus:    e.triageStatus || "unread",
+        priority:        e.priority || autoPriority(e.sender || e.from || ""),
+        company:         e.company || "",
+        suggested_action: e.suggested_action || "",
+        assigned_to:     e.assigned_to || "",
+        status:          "Open",
+        tags:            e.tags || [],
+        audit_log:       [],
+        received_date_time: e.timestamp || e.received_date_time || new Date().toISOString(),
+        has_attachments: e.has_attachments || false,
+        is_read:         false,
+        web_link:        e.web_link || "#",
+        last_updated:    new Date().toISOString()
+      })));
+    }
+  });
+
+  // Also accept window.postMessage (local file fallback)
+  window.addEventListener("message", evt => {
+    if (evt.data?.type === "ETD_WEBHOOK") {
+      const arr = Array.isArray(evt.data.emails) ? evt.data.emails : [evt.data.email];
+      bc.dispatchEvent(new MessageEvent("message",{data:{type:"NEW_EMAILS",emails:arr.filter(Boolean)}}));
+    }
+  });
+
+  // Poll N8N every 10 seconds for new emails
+  setInterval(async () => {
+    try {
+      const res = await fetch('https://n8n.crmz.com/webhook/Emails');
+      const data = await res.json();
+      if (data.emails && data.emails.length > 0) {
+        injectEmails(data.emails);
+      }
+    } catch(e) {
+      console.log('Poll error:', e);
+    }
+  }, 10000);
+}
+
+// ── INIT ──────────────────────────────────────────────────
+render();
+registerSW();
+</script>
+
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body></html>
