@@ -526,6 +526,39 @@ kbd {
 }
 .pri-sel:focus { border-color: var(--red); }
 
+/* Panel save form */
+.sp-save-form { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--b0); }
+.sp-save-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.sp-save-field { display: flex; flex-direction: column; gap: 3px; }
+.sp-save-label { font-size: 10px; font-weight: 700; color: var(--t2); text-transform: uppercase; letter-spacing: .4px; }
+.sp-save-sel, .sp-save-note {
+  padding: 5px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--b1);
+  background: var(--surface);
+  color: var(--t0);
+  font-family: var(--font);
+  font-size: 12px;
+  outline: none;
+}
+.sp-save-sel:focus, .sp-save-note:focus { border-color: var(--red); }
+.sp-save-note { resize: vertical; min-height: 52px; width: 100%; box-sizing: border-box; }
+.btn-sp-save {
+  width: 100%;
+  padding: 7px;
+  border-radius: 5px;
+  border: none;
+  background: var(--blue);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-sp-save:hover { background: var(--blue-hover, #1a3f7a); }
+.btn-sp-save.saved { background: var(--green); }
+
 /* Meta grid inside panel */
 .meta-grid { display: grid; grid-template-columns: 80px 1fr; gap: 4px 10px; font-size: 12px; margin-bottom: 14px; background: var(--elevated); border: 1px solid var(--b0); border-radius: var(--r); padding: 10px 12px; }
 .meta-k { color: var(--t2); font-weight: 700; text-transform: uppercase; font-size: 10px; letter-spacing: .4px; align-self: start; padding-top: 2px; }
@@ -787,12 +820,12 @@ A confidential financial statement has been uploaded for ASJ Holdings Ltd throug
       <td><span class="pill pill-open"><span class="pill-dot"></span>OPEN</span></td>
       <td class="col-date">Mar 11, 7:12 AM</td>
       <td class="col-date"><span style="color:var(--t3)">—</span></td>
-    </tr><tr class="unread" onclick="openDetail(&#39;MSG-007&#39;)">
+    </tr><tr class="" onclick="openDetail(&#39;MSG-007&#39;)">
       <td style="text-align:center" onclick="event.stopPropagation()">
         <button title="Delete email" onclick="deleteEmail(&#39;MSG-007&#39;)" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;padding:2px 4px;border-radius:3px;line-height:1" onmouseover="this.style.color=&#39;var(--red)&#39;;this.style.background=&#39;var(--red-dim)&#39;" onmouseout="this.style.color=&#39;var(--t3)&#39;;this.style.background=&#39;none&#39;">🗑</button>
       </td>
       <td style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--t3)">MSG-007</td>
-      <td><span class="pill pl">Low</span></td>
+      <td><span class="pill ph">High</span></td>
       <td class="col-conv">
         <span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAKdP3Gx8S2NcvE7bRm1qTF4=">AAQkADAx…1qTF4=</span>
         <div style="margin-top:2px"><span class="thread-count" title="2 messages">2</span> <span style="font-size:10px;color:var(--t2)">msgs</span></div>
@@ -818,7 +851,7 @@ Multiple portal responses have been received. Please resolve the threaded questi
         <span>triage@financials</span>
         <span class="assign-edit-ico">✏</span>
       </td>
-      <td><span class="pill pill-unread"><span class="pill-dot"></span>UNREAD</span></td>
+      <td><span class="pill pill-resolved"><span class="pill-dot"></span>RESOLVED</span></td>
       <td class="col-date">Mar 11, 8:45 AM</td>
       <td class="col-date"><span style="color:var(--t3)">—</span></td>
     </tr><tr class="" onclick="openDetail(&#39;MSG-004&#39;)">
@@ -1089,11 +1122,11 @@ return [{
     <div class="sp-stripe"></div>
     <div class="sp-head">
       <div style="flex:1;min-width:0">
-        <div class="sp-subject">Confidential Financial Statement Upload for ASJ Holdings Ltd</div>
+        <div class="sp-subject">RE: RE: Invitation to Upload Financial Statements</div>
         <div class="sp-meta-row">
-          <span class="pill pill-open"><span class="pill-dot"></span>OPEN</span>
-          <span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAL9wJm5eU6XDsN4hFc2vYQ3=">AAQkADAx…2vYQ3=</span>
-          
+          <span class="pill pill-resolved"><span class="pill-dot"></span>RESOLVED</span>
+          <span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAKdP3Gx8S2NcvE7bRm1qTF4=">AAQkADAx…1qTF4=</span>
+          <span style="color:var(--amber);font-size:12px">📎 Attachment</span>
         </div>
       </div>
       <button class="sp-close" onclick="closePanel()">
@@ -1106,7 +1139,7 @@ return [{
         <span class="meta-k">Priority</span>
         <span class="meta-v" style="display:flex;align-items:center;gap:7px">
           <span class="pill ph">High</span>
-          <select class="pri-sel" onclick="event.stopPropagation()" onchange="setPriority(&#39;MSG-008&#39;,this.value)">
+          <select class="pri-sel" onclick="event.stopPropagation()" onchange="setPriority(&#39;MSG-007&#39;,this.value)">
             <option value="High" selected="">High</option>
             <option value="Medium">Medium</option>
             <option value="Low">Low</option>
@@ -1114,66 +1147,142 @@ return [{
         </span>
 
         <span class="meta-k">Status</span>
-        <span class="meta-v"><span class="pill pill-open"><span class="pill-dot"></span>OPEN</span></span>
+        <span class="meta-v"><span class="pill pill-resolved"><span class="pill-dot"></span>RESOLVED</span></span>
 
         <span class="meta-k">From</span>
-        <span class="meta-v">risk.central.support@philips.onmicrosoft.com</span>
+        <span class="meta-v">CGulick@creditriskmonitor.com</span>
 
         <span class="meta-k">To</span>
         <span class="meta-v">
-          <span style="display:inline-block;margin:1px 4px 1px 0;padding:1px 6px;border-radius:3px;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(26,79,156,.2);font-size:11px">ops@financials</span>
+          <span style="display:inline-block;margin:1px 4px 1px 0;padding:1px 6px;border-radius:3px;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(26,79,156,.2);font-size:11px">triage@financials</span><span style="display:inline-block;margin:1px 4px 1px 0;padding:1px 6px;border-radius:3px;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(26,79,156,.2);font-size:11px">david.holland</span>
         </span>
 
         
         <span class="meta-k">CC</span>
         <span class="meta-v">
-          <span style="display:inline-block;margin:1px 4px 1px 0;padding:1px 6px;border-radius:3px;background:var(--elevated);color:var(--t1);border:1px solid var(--b0);font-size:11px">triage@financials</span><span style="display:inline-block;margin:1px 4px 1px 0;padding:1px 6px;border-radius:3px;background:var(--elevated);color:var(--t1);border:1px solid var(--b0);font-size:11px">richard.narine</span>
+          <span style="display:inline-block;margin:1px 4px 1px 0;padding:1px 6px;border-radius:3px;background:var(--elevated);color:var(--t1);border:1px solid var(--b0);font-size:11px">ops@financials</span>
         </span>
 
         <span class="meta-k">Received</span>
-        <span class="meta-v">3/11/2026, 7:12:34 AM</span>
+        <span class="meta-v">3/11/2026, 8:45:36 AM</span>
 
         <span class="meta-k">Company</span>
-        <span class="meta-v" style="font-weight:700">ASJ Holdings Ltd</span>
+        <span class="meta-v" style="font-weight:700">Interpak BTM</span>
 
         <span class="meta-k">Conv ID</span>
-        <span class="meta-v"><span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAL9wJm5eU6XDsN4hFc2vYQ3=">AAQkADAx…2vYQ3=</span></span>
+        <span class="meta-v"><span class="conv-chip" title="AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAKdP3Gx8S2NcvE7bRm1qTF4=">AAQkADAx…1qTF4=</span></span>
 
         <span class="meta-k">Assigned</span>
-        <span class="meta-v assign-cell" style="cursor:pointer" onclick="startEditPanelAssignee(&#39;MSG-008&#39;,this)">
-          <span>ops@financials</span>
+        <span class="meta-v assign-cell" style="cursor:pointer" onclick="startEditPanelAssignee(&#39;MSG-007&#39;,this)">
+          <span>triage@financials</span>
           <span class="assign-edit-ico">✏</span>
         </span>
 
         <span class="meta-k">Outlook</span>
-        <span class="meta-v"><a href="https://outlook/.../MSG-008" target="_blank">Open in Outlook ↗</a></span>
+        <span class="meta-v"><a href="https://outlook/.../MSG-007" target="_blank">Open in Outlook ↗</a></span>
       </div>
 
       <div class="callout">
         <div class="callout-label">Suggested Action</div>
-        <div class="callout-text">Confirm portal acknowledgements</div>
+        <div class="callout-text">Resolve threaded questions; confirm upload status</div>
       </div>
 
-      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px"><span class="chip">portal</span></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px"><span class="chip">thread</span><span class="chip">follow-up</span></div>
 
       <div class="sp-sec-title">Email Body</div>
-      <div class="email-body">Portal Notification:
+      <div class="email-body">Continued thread regarding Interpak BTM financial statement upload.
 
-A confidential financial statement has been uploaded for ASJ Holdings Ltd through the portal functional account. Please confirm acknowledgement and verify processing status.</div>
+Multiple portal responses have been received. Please resolve the threaded questions and confirm the final upload status.</div>
 
       <div class="sp-actions">
         <button class="btn btn-amber btn-sm" onclick="openPriModal()">Set Status</button>
         <button class="btn btn-ghost btn-sm" onclick="doMoveTag()">Move/Tag</button>
-        <button class="btn btn-success btn-sm" onclick="doResolve()">Resolve</button>
+        
         <button class="btn btn-ghost btn-sm" onclick="doRerun()">Re-classify</button>
-        <button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid rgba(192,0,0,.2)" onclick="deleteEmail(&#39;MSG-008&#39;)">Delete</button>
+        <button class="btn btn-sm" style="background:var(--red-dim);color:var(--red);border:1px solid rgba(192,0,0,.2)" onclick="deleteEmail(&#39;MSG-007&#39;)">Delete</button>
       </div>
 
       
+      <div class="sp-sec-title">Thread — 2 messages in AAQkADAxNmRlZmQ0LTUzM2YtNDI5OC1hYjczLTM1YmNhMGYyMTIxZQAQAKdP3Gx8S2NcvE7bRm1qTF4=</div>
+      <div class="thread-item active" onclick="openDetail(&#39;MSG-007&#39;)">
+          <div class="thread-item-head">
+            <span class="thread-from">1. CGulick@creditriskmonitor.com</span>
+            <span class="pill pill-resolved"><span class="pill-dot"></span>RESOLVED</span>
+            <span class="thread-time">Mar 11, 8:45 AM</span>
+          </div>
+          <div class="thread-preview">RE: RE: Invitation to Upload Financial Statements</div>
+          <div class="thread-preview" style="color:var(--t3);margin-top:1px">Thread references Risk.central.support and portal responses for Interpak BTM. Multiple portal responses received — resolve threaded questions and confirm upload status.</div>
+          <div class="thread-rcpt">↓ triage@financials, david.holland, ops@financials</div>
+        </div><div class="thread-item" onclick="openDetail(&#39;MSG-006&#39;)">
+          <div class="thread-item-head">
+            <span class="thread-from">2. CGulick@creditriskmonitor.com</span>
+            <span class="pill pill-open"><span class="pill-dot"></span>OPEN</span>
+            <span class="thread-time">Mar 11, 9:02 AM</span>
+          </div>
+          <div class="thread-preview">RE: Invitation to Upload Financial Statements</div>
+          <div class="thread-preview" style="color:var(--t3);margin-top:1px">Forwarded from Risk.central.support — please find attached the financial statements PDF for Interpak BTM. Verify content and confirm portal upload.</div>
+          <div class="thread-rcpt">↓ triage@financials</div>
+        </div>
 
       <div class="sp-sec-title">Audit Log</div>
-      <div style="font-size:11px;color:var(--t3)">No events yet</div>
       
+      
+        <div class="audit-entry">
+          <div class="audit-head">
+            <span class="audit-act">manual_update</span>
+            <span class="audit-time">3/16/2026, 2:24:47 PM</span>
+          </div>
+          <div class="audit-detail">by Manager — Priority→High, Status→resolved</div>
+        </div>
+        <div class="audit-entry">
+          <div class="audit-head">
+            <span class="audit-act">set_status</span>
+            <span class="audit-time">3/16/2026, 2:24:41 PM</span>
+          </div>
+          <div class="audit-detail">by Manager — Set to resolved</div>
+        </div>
+        <div class="audit-entry">
+          <div class="audit-head">
+            <span class="audit-act">set_priority</span>
+            <span class="audit-time">3/16/2026, 2:24:33 PM</span>
+          </div>
+          <div class="audit-detail">by Manager — Priority → High</div>
+        </div>
+        <div class="audit-entry">
+          <div class="audit-head">
+            <span class="audit-act">manual_update</span>
+            <span class="audit-time">3/16/2026, 2:24:27 PM</span>
+          </div>
+          <div class="audit-detail">by Manager — Priority→Low, Status→open</div>
+        </div>
+
+      
+      <div class="sp-save-form">
+        <div class="sp-sec-title" style="margin-top:0">Save Changes</div>
+        <div class="sp-save-grid">
+          <div class="sp-save-field">
+            <label class="sp-save-label">Priority</label>
+            <select class="sp-save-sel" id="sp-pri-sel">
+              <option value="High" selected="">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div class="sp-save-field">
+            <label class="sp-save-label">Status</label>
+            <select class="sp-save-sel" id="sp-status-sel">
+              <option value="unread">Unread</option>
+              <option value="open">Open</option>
+              <option value="resolved" selected="">Resolved</option>
+            </select>
+          </div>
+        </div>
+        <div class="sp-save-field" style="margin-bottom:8px">
+          <label class="sp-save-label">Note</label>
+          <textarea class="sp-save-note" id="sp-save-note" placeholder="Reason for change…"></textarea>
+        </div>
+        <button class="btn-sp-save" id="btn-sp-save" onclick="savePanelChanges(&#39;MSG-007&#39;,this)">Save</button>
+      </div>
     </div></div>
 
 <!-- ── Modals ─────────────────────────────────────────────── -->
@@ -1200,7 +1309,7 @@ A confidential financial statement has been uploaded for ASJ Holdings Ltd throug
 <div class="modal-wrap" id="priorityModal">
   <div class="modal">
     <div class="modal-title">Set Triage Status</div>
-    <div style="display:flex;gap:7px;margin-bottom:14px" id="priBtnGrp"></div>
+    <div style="display:flex;gap:7px;margin-bottom:14px" id="priBtnGrp"><button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="triageTarget=&#39;unread&#39;;renderPriBtns()">Unread</button><button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="triageTarget=&#39;open&#39;;renderPriBtns()">Open</button><button class="btn btn-success" style="flex:1;justify-content:center" onclick="triageTarget=&#39;resolved&#39;;renderPriBtns()">Resolved</button></div>
     <label class="modal-label">Reason</label>
     <textarea class="modal-ta" id="priReason" placeholder="Why are you changing triage status?"></textarea>
     <div class="modal-foot">
@@ -2020,6 +2129,35 @@ function renderPanel() {
           </div>
           <div class="audit-detail">by ${esc(a.user)}${a.note?" — "+esc(a.note):""}</div>
         </div>`).join("")}
+
+      ${r!=="Viewer"?`
+      <div class="sp-save-form">
+        <div class="sp-sec-title" style="margin-top:0">Save Changes</div>
+        <div class="sp-save-grid">
+          <div class="sp-save-field">
+            <label class="sp-save-label">Priority</label>
+            <select class="sp-save-sel" id="sp-pri-sel">
+              <option value="High"   ${(e.priority||autoPriority(e.sender))==='High'   ?'selected':''}>High</option>
+              <option value="Medium" ${(e.priority||autoPriority(e.sender))==='Medium' ?'selected':''}>Medium</option>
+              <option value="Low"    ${(e.priority||autoPriority(e.sender))==='Low'    ?'selected':''}>Low</option>
+            </select>
+          </div>
+          <div class="sp-save-field">
+            <label class="sp-save-label">Status</label>
+            <select class="sp-save-sel" id="sp-status-sel">
+              <option value="unread"   ${triageStatusOf(e)==='unread'   ?'selected':''}>Unread</option>
+              <option value="open"     ${triageStatusOf(e)==='open'     ?'selected':''}>Open</option>
+              <option value="resolved" ${triageStatusOf(e)==='resolved' ?'selected':''}>Resolved</option>
+            </select>
+          </div>
+        </div>
+        <div class="sp-save-field" style="margin-bottom:8px">
+          <label class="sp-save-label">Note</label>
+          <textarea class="sp-save-note" id="sp-save-note" placeholder="Reason for change…"></textarea>
+        </div>
+        <button class="btn-sp-save" id="btn-sp-save"
+          onclick="savePanelChanges('${esc(e.message_id)}',this)">Save</button>
+      </div>`:""}
     </div>`;
 }
 
@@ -2109,6 +2247,21 @@ function doRerun() {
 function setPriority(msgId, val) {
   updateEmail(msgId, {priority: val}, 'set_priority', `Priority → ${val}`);
   toast(`Priority → ${val}`);
+}
+
+function savePanelChanges(msgId, btn) {
+  const priority     = document.getElementById('sp-pri-sel')?.value;
+  const triageStatus = document.getElementById('sp-status-sel')?.value;
+  const note         = document.getElementById('sp-save-note')?.value.trim();
+  const patches = {};
+  if (priority)     patches.priority     = priority;
+  if (triageStatus) patches.triageStatus = triageStatus;
+  updateEmail(msgId, patches, 'manual_update', note || `Priority→${priority||'—'}, Status→${triageStatus||'—'}`);
+  if (document.getElementById('sp-save-note')) document.getElementById('sp-save-note').value = '';
+  toast(`Saved — Priority: ${priority||'—'}, Status: ${triageStatus||'—'}`);
+  btn.textContent = '✓ Saved';
+  btn.classList.add('saved');
+  setTimeout(() => { btn.textContent = 'Save'; btn.classList.remove('saved'); }, 1800);
 }
 
 // ═══════════════════════════════════════════════════════════
